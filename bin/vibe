@@ -1,0 +1,380 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# ============================================================================
+# vibe — Claude Vibe CLI
+# ============================================================================
+#
+# Interactive local AI development environment for Claude Code.
+#
+# Usage:
+#   vibe install              Full guided setup
+#   vibe install --step N     Run a specific step (1-8)
+#   vibe install --resume     Resume from last completed step
+#   vibe validate             Run full validation suite
+#   vibe status               Show setup progress
+#   vibe reset                Reset install state and start over
+#   vibe doctor               Diagnose common issues
+#   vibe help                 Show this help
+#   vibe version              Show version
+#
+# ============================================================================
+
+VIBE_VERSION="1.0.0"
+
+# Resolve the real script location (follows symlinks)
+resolve_path() {
+  local target="$1"
+  while [[ -L "$target" ]]; do
+    local dir="$(cd -P "$(dirname "$target")" && pwd)"
+    target="$(readlink "$target")"
+    [[ "$target" != /* ]] && target="$dir/$target"
+  done
+  echo "$(cd -P "$(dirname "$target")" && pwd)"
+}
+
+VIBE_BIN_DIR="$(resolve_path "${BASH_SOURCE[0]}")"
+VIBE_HOME="$(cd "$VIBE_BIN_DIR/.." && pwd)"
+
+# Source helpers and step scripts
+source "$VIBE_HOME/lib/tty.sh"
+source "$VIBE_HOME/steps/01-install-claude.sh"
+source "$VIBE_HOME/steps/02-google-oauth.sh"
+source "$VIBE_HOME/steps/03-enable-apis.sh"
+source "$VIBE_HOME/steps/04-install-tools.sh"
+source "$VIBE_HOME/steps/05-ai-dev-kit.sh"
+source "$VIBE_HOME/steps/06-install-plugins.sh"
+source "$VIBE_HOME/steps/07-configure-mcp.sh"
+source "$VIBE_HOME/steps/08-validate.sh"
+
+# Step registry
+STEPS=(
+  "install_claude|Step 1: Install Claude Code"
+  "google_oauth|Step 2: Google OAuth Setup"
+  "enable_apis|Step 3: Enable Google APIs"
+  "install_tools|Step 4: Install Core Tools"
+  "ai_dev_kit|Step 5: Databricks AI Dev Kit"
+  "install_plugins|Step 6: Claude Code Plugins"
+  "configure_mcp|Step 7: MCP Integrations"
+  "validate|Step 8: Full Validation"
+)
+
+STEP_FUNCTIONS=(
+  step_install_claude
+  step_google_oauth
+  step_enable_apis
+  step_install_tools
+  step_ai_dev_kit
+  step_install_plugins
+  step_configure_mcp
+  step_validate
+)
+
+# ── Banner ──────────────────────────────────────────────────────────────────
+
+show_banner() {
+  echo ""
+  echo -e "${CYAN}${BOLD}"
+  cat << 'BANNER'
+     _____ _                 _      __     _____ _
+    / ____| |               | |     \ \   / /_ _| |__   ___
+   | |    | | __ _ _   _  __| | ___  \ \ / / | || '_ \ / _ \
+   | |    | |/ _` | | | |/ _` |/ _ \  \ V /  | || |_) |  __/
+   | |____| | (_| | |_| | (_| |  __/   | |  |___|_.__/ \___|
+    \_____|_|\__,_|\__,_|\__,_|\___|   |_|
+BANNER
+  echo -e "${NC}"
+  echo -e "  ${DIM}Local AI Development Environment — v${VIBE_VERSION}${NC}"
+  echo -e "  ${DIM}────────────────────────────────────────${NC}"
+  echo ""
+}
+
+# ── Step overview ───────────────────────────────────────────────────────────
+
+show_overview() {
+  local completed=0
+  local total=${#STEPS[@]}
+
+  echo -e "  ${BOLD}Setup Progress${NC}"
+  echo ""
+  for i in "${!STEPS[@]}"; do
+    local step_id="${STEPS[$i]%%|*}"
+    local step_name="${STEPS[$i]##*|}"
+    if is_step_complete "$step_id"; then
+      echo -e "    ${CHECK} ${DIM}${step_name}${NC}"
+      ((completed++))
+    else
+      echo -e "    ${BULLET} ${step_name}"
+    fi
+  done
+  echo ""
+  show_progress "$completed" "$total"
+}
+
+# ── Run steps ───────────────────────────────────────────────────────────────
+
+run_step() {
+  local step_num=$1
+  local step_idx=$((step_num - 1))
+  local step_id="${STEPS[$step_idx]%%|*}"
+
+  if is_step_complete "$step_id"; then
+    local step_name="${STEPS[$step_idx]##*|}"
+    print_success "${step_name} — already complete"
+    if ! ask_yes_no "Run again?" "n"; then
+      return 0
+    fi
+  fi
+
+  ${STEP_FUNCTIONS[$step_idx]}
+}
+
+run_all() {
+  local start=${1:-1}
+  for i in $(seq "$start" ${#STEPS[@]}); do
+    run_step "$i"
+    local step_idx=$((i - 1))
+    local step_id="${STEPS[$step_idx]%%|*}"
+    if ! is_step_complete "$step_id" && [[ "$step_id" != "validate" ]]; then
+      print_blank
+      if ! ask_yes_no "Step did not complete. Continue to next step?" "y"; then
+        print_info "Run 'vibe install --resume' to continue later"
+        return 1
+      fi
+    fi
+  done
+}
+
+find_resume_point() {
+  for i in "${!STEPS[@]}"; do
+    local step_id="${STEPS[$i]%%|*}"
+    if ! is_step_complete "$step_id"; then
+      echo $((i + 1))
+      return
+    fi
+  done
+  echo 1
+}
+
+# ── Commands ────────────────────────────────────────────────────────────────
+
+cmd_install() {
+  require_macos
+  init_state
+
+  case "${1:-}" in
+    --step)
+      local step="${2:-}"
+      if [[ -z "$step" || "$step" -lt 1 || "$step" -gt 8 ]]; then
+        print_error "Usage: vibe install --step N (1-8)"
+        exit 1
+      fi
+      show_banner
+      run_step "$step"
+      ;;
+    --resume)
+      show_banner
+      show_overview
+      local resume_point
+      resume_point=$(find_resume_point)
+      if [[ $resume_point -gt ${#STEPS[@]} ]]; then
+        print_success "All steps already complete!"
+        print_info "Run 'vibe validate' to re-run validation"
+        return 0
+      fi
+      print_info "Resuming from step $resume_point"
+      print_blank
+      run_all "$resume_point"
+      ;;
+    ""|--all)
+      show_banner
+      show_overview
+      if ask_yes_no "Start full setup?" "y"; then
+        run_all
+      else
+        print_info "Run 'vibe help' for options"
+      fi
+      ;;
+    *)
+      print_error "Unknown option: $1"
+      print_info "Usage: vibe install [--step N | --resume]"
+      exit 1
+      ;;
+  esac
+}
+
+cmd_validate() {
+  require_macos
+  init_state
+  show_banner
+  step_validate
+}
+
+cmd_status() {
+  require_macos
+  init_state
+  show_banner
+  show_overview
+}
+
+cmd_reset() {
+  init_state
+  if ask_yes_no "Reset all install state? This won't uninstall anything" "n"; then
+    rm -f "$HOME/.claude-vibe/install-state.json"
+    init_state
+    print_success "Install state reset"
+    print_info "Run 'vibe install' to start over"
+  fi
+}
+
+cmd_doctor() {
+  require_macos
+  init_state
+  show_banner
+  print_header "Diagnostics"
+
+  # Check vibe itself
+  print_step "vibe CLI"
+  print_success "vibe v${VIBE_VERSION} at ${VIBE_HOME}"
+
+  # Check critical paths
+  print_blank
+  print_step "Critical files"
+  local files=(
+    "$HOME/.claude.json|MCP server config"
+    "$HOME/.claude/settings.json|Plugin settings"
+    "$HOME/.config/gcloud/application_default_credentials.json|Google ADC"
+    "$HOME/.config/gcloud/credentials/claude-google-auth.json|OAuth client"
+    "$HOME/.vibe/env|Environment variables"
+    "$HOME/.claude-vibe/install-state.json|Install state"
+  )
+  for entry in "${files[@]}"; do
+    local path="${entry%%|*}"
+    local desc="${entry##*|}"
+    if [[ -f "$path" ]]; then
+      print_success "$desc"
+    else
+      print_warn "$desc — ${DIM}$path${NC}"
+    fi
+  done
+
+  # Check for common issues
+  print_blank
+  print_step "Common issues"
+
+  # Duplicate PATH entries
+  local dup_count
+  dup_count=$(grep -c 'HOME/.local/bin' "$HOME/.zprofile" 2>/dev/null || echo 0)
+  if [[ $dup_count -gt 1 ]]; then
+    print_warn "~/.zprofile has $dup_count duplicate PATH entries"
+  else
+    print_success "~/.zprofile is clean"
+  fi
+
+  # GCP quota project placeholder
+  if grep -q "your-gcp-project-id" "$HOME/.vibe/env" 2>/dev/null; then
+    print_warn "GCP_QUOTA_PROJECT still has placeholder value in ~/.vibe/env"
+  else
+    print_success "GCP_QUOTA_PROJECT is set"
+  fi
+
+  # Token expiry
+  if gcloud auth application-default print-access-token &>/dev/null; then
+    print_success "Google auth token is valid"
+  else
+    print_warn "Google auth token expired — run 'vibe install --step 2'"
+  fi
+
+  print_blank
+  print_info "Run 'vibe validate' for a full check of all components"
+}
+
+cmd_version() {
+  echo "vibe ${VIBE_VERSION}"
+}
+
+cmd_help() {
+  echo -e "${BOLD}vibe${NC} — Claude Vibe CLI"
+  echo ""
+  echo -e "${BOLD}USAGE${NC}"
+  echo "  vibe <command> [options]"
+  echo ""
+  echo -e "${BOLD}COMMANDS${NC}"
+  echo "  install              Full guided setup"
+  echo "  install --step N     Run a specific step (1-8)"
+  echo "  install --resume     Resume from last completed step"
+  echo "  validate             Run full validation suite"
+  echo "  status               Show setup progress"
+  echo "  doctor               Diagnose common issues"
+  echo "  reset                Reset install state"
+  echo "  version              Show version"
+  echo "  help                 Show this help"
+  echo ""
+  echo -e "${BOLD}STEPS${NC}"
+  for i in "${!STEPS[@]}"; do
+    echo "  $((i + 1)). ${STEPS[$i]##*|}"
+  done
+  echo ""
+  echo -e "${BOLD}EXAMPLES${NC}"
+  echo "  vibe install            # Run full setup"
+  echo "  vibe install --step 3   # Re-run Google API setup"
+  echo "  vibe install --resume   # Continue where you left off"
+  echo "  vibe validate           # Check everything works"
+  echo "  vibe doctor             # Troubleshoot issues"
+  echo ""
+}
+
+# ── Self-install ────────────────────────────────────────────────────────────
+
+cmd_self_install() {
+  local target_dir="$HOME/.local/bin"
+  local target="$target_dir/vibe"
+  local source="$VIBE_HOME/bin/vibe"
+
+  mkdir -p "$target_dir"
+
+  if [[ -L "$target" || -f "$target" ]]; then
+    local current
+    current=$(readlink "$target" 2>/dev/null || echo "")
+    if [[ "$current" == "$source" ]]; then
+      print_success "vibe already installed at $target"
+      return 0
+    fi
+  fi
+
+  ln -sf "$source" "$target"
+  print_success "Installed: $target → $source"
+
+  # Ensure PATH
+  if ! echo "$PATH" | grep -q "$target_dir"; then
+    print_warn "$target_dir is not in your PATH"
+    print_info "Add to ~/.zprofile: export PATH=\"\$HOME/.local/bin:\$PATH\""
+  fi
+}
+
+# ── Main ────────────────────────────────────────────────────────────────────
+
+main() {
+  case "${1:-}" in
+    install)   shift; cmd_install "$@" ;;
+    validate)  cmd_validate ;;
+    status)    cmd_status ;;
+    reset)     cmd_reset ;;
+    doctor)    cmd_doctor ;;
+    version)   cmd_version ;;
+    help|--help|-h) cmd_help ;;
+    self-install)   cmd_self_install ;;
+    "")
+      show_banner
+      cmd_help
+      ;;
+    *)
+      print_error "Unknown command: $1"
+      echo ""
+      cmd_help
+      exit 1
+      ;;
+  esac
+}
+
+main "$@"

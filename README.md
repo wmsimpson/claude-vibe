@@ -18,7 +18,21 @@ cd claude-vibe
 ./setup.sh
 ```
 
-The installer walks you through each step interactively. No prior setup needed beyond a Mac and a Claude subscription.
+This installs the `vibe` command and launches the interactive installer. From then on, use `vibe` directly from anywhere.
+
+## Usage
+
+```bash
+vibe install              # Full guided setup
+vibe install --step 3     # Run a specific step
+vibe install --resume     # Resume from where you left off
+vibe validate             # Run full validation suite
+vibe status               # Show setup progress
+vibe doctor               # Diagnose common issues
+vibe reset                # Reset install state
+vibe version              # Show version
+vibe help                 # Show all commands
+```
 
 ## What It Does
 
@@ -32,16 +46,6 @@ The installer walks you through each step interactively. No prior setup needed b
 | 6 | Install Claude Code plugins (Google, app dev, workflows) | 1 min |
 | 7 | Configure MCP integrations (GitHub, Chrome DevTools, optional others) | 2 min |
 | 8 | Run full validation suite | 30 sec |
-
-## Usage
-
-```bash
-./setup.sh                # Full guided setup
-./setup.sh --step 3       # Run a specific step
-./setup.sh --resume       # Resume from where you left off
-./setup.sh --validate     # Run validation only
-./setup.sh --reset        # Start over
-```
 
 ## Prerequisites
 
@@ -65,7 +69,8 @@ Restart Claude Code, then try:
 
 ```
 claude-vibe/
-  setup.sh              Main interactive installer
+  setup.sh              Bootstrap — installs vibe command and runs installer
+  bin/vibe              CLI entry point (symlinked to ~/.local/bin/vibe)
   lib/tty.sh            TTY UI helpers (colors, prompts, spinners)
   steps/
     01-install-claude.sh
@@ -85,6 +90,7 @@ claude-vibe/
 
 | What | Where |
 |------|-------|
+| vibe CLI | `~/.local/bin/vibe` (symlink to repo) |
 | Claude Code binary | `/usr/local/bin/claude` |
 | OAuth credentials | `~/.config/gcloud/credentials/claude-google-auth.json` |
 | Google ADC | `~/.config/gcloud/application_default_credentials.json` |
@@ -98,6 +104,8 @@ claude-vibe/
 
 ## Troubleshooting
 
+Run `vibe doctor` for automated diagnostics.
+
 **"This app is blocked" during Google OAuth**
 - You need your own OAuth client ID (Step 2 walks you through creating one)
 
@@ -105,7 +113,7 @@ claude-vibe/
 - The installer detects this and uses npm instead of Homebrew (no Bun runtime)
 
 **Google APIs return 403**
-- Run `./setup.sh --step 3` to enable APIs and set the quota project
+- Run `vibe install --step 3` to enable APIs and set the quota project
 
 **Plugins not loading after install**
 - Restart Claude Code — plugins load at startup
