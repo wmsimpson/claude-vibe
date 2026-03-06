@@ -57,7 +57,7 @@ step_configure_mcp() {
   print_step "Optional integrations"
   print_blank
 
-  local optional_mcps=("Slack" "JIRA" "Brave Search" "Notion" "Skip")
+  local optional_mcps=("Slack" "Brave Search" "Skip")
   ask_multi_select "Select additional integrations to configure:" "${optional_mcps[@]}"
 
   for idx in "${SELECTED_INDICES[@]}"; do
@@ -76,23 +76,6 @@ step_configure_mcp() {
           print_success "Slack MCP configured"
         fi
         ;;
-      "JIRA")
-        print_blank
-        print_info "JIRA MCP requires an Atlassian API token"
-        print_info "Create one at: id.atlassian.com/manage-profile/security/api-tokens"
-        local jira_url
-        jira_url=$(ask_input "JIRA URL" "https://your-org.atlassian.net")
-        local jira_user
-        jira_user=$(ask_input "JIRA email")
-        local jira_token
-        jira_token=$(ask_secret "JIRA API Token")
-        if [[ -n "$jira_url" && -n "$jira_user" && -n "$jira_token" ]]; then
-          _add_mcp_server "jira" "uvx" '["mcp-atlassian"]' \
-            "{\"JIRA_URL\":\"$jira_url\",\"JIRA_USERNAME\":\"$jira_user\",\"JIRA_API_TOKEN\":\"$jira_token\"}"
-          _add_env_var "JIRA_API_TOKEN" "$jira_token"
-          print_success "JIRA MCP configured"
-        fi
-        ;;
       "Brave Search")
         print_blank
         print_info "Free: 1000 queries/month at brave.com/search/api"
@@ -103,18 +86,6 @@ step_configure_mcp() {
             "{\"BRAVE_API_KEY\":\"$brave_key\"}"
           _add_env_var "BRAVE_API_KEY" "$brave_key"
           print_success "Brave Search MCP configured"
-        fi
-        ;;
-      "Notion")
-        print_blank
-        print_info "Create an integration at notion.so/my-integrations"
-        local notion_token
-        notion_token=$(ask_secret "Notion API Token")
-        if [[ -n "$notion_token" ]]; then
-          _add_mcp_server "notion" "npx" '["-y","@modelcontextprotocol/server-notion"]' \
-            "{\"NOTION_API_TOKEN\":\"$notion_token\"}"
-          _add_env_var "NOTION_API_TOKEN" "$notion_token"
-          print_success "Notion MCP configured"
         fi
         ;;
       "Skip") ;;

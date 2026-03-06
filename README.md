@@ -7,7 +7,7 @@ One command gets you:
 - **Google Workspace** access (Gmail, Docs, Sheets, Slides, Calendar, Forms, Tasks)
 - **Databricks AI Dev Kit** (50+ MCP tools, 34 skills)
 - **Claude Code Plugins** (Google tools, app dev, workflows, Lean Six Sigma, and more)
-- **MCP Integrations** (GitHub, Chrome DevTools, Slack, JIRA, Notion, Brave Search)
+- **MCP Integrations** (GitHub, Chrome DevTools, Slack, Brave Search)
 - **Full validation** to confirm everything works
 
 ## Quick Start
