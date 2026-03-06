@@ -13,7 +13,7 @@ One command gets you:
 ## Quick Start
 
 ```bash
-git clone https://github.com/wsimpsonjr/claude-vibe.git
+git clone https://github.com/wmsimpson/claude-vibe.git
 cd claude-vibe
 ./setup.sh
 ```
