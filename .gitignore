@@ -1,0 +1,14 @@
+# Secrets — never commit
+.vibe/env
+*.secret
+*.token
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+
+# Node
+node_modules/
