@@ -5,7 +5,17 @@ step_google_oauth() {
   print_header "Step 2 of 8 — Google OAuth Setup"
 
   local cred_dir="$HOME/.config/gcloud/credentials"
-  local cred_file="$cred_dir/claude-google-auth.json"
+
+  # Use profile name in credential filename to avoid collisions
+  local active_profile
+  active_profile=$(_get_active_profile 2>/dev/null || echo "")
+  local cred_name
+  if [[ -n "$active_profile" ]]; then
+    cred_name="${active_profile}-google-auth.json"
+  else
+    cred_name="claude-google-auth.json"
+  fi
+  local cred_file="$cred_dir/$cred_name"
 
   # Check if credentials already exist
   if [[ -f "$cred_file" ]]; then
@@ -37,7 +47,7 @@ step_google_oauth() {
   echo -e "  ${CYAN}2.${NC} Create a project (e.g. ${BOLD}claude-code-local${NC}) or select an existing one"
   echo -e "  ${CYAN}3.${NC} Go to ${BOLD}APIs & Services → Credentials${NC}"
   echo -e "  ${CYAN}4.${NC} Click ${BOLD}Create Credentials → OAuth client ID${NC}"
-  echo -e "  ${CYAN}5.${NC} Select ${BOLD}Desktop app${NC}, name it ${BOLD}claude-google-auth${NC}"
+  echo -e "  ${CYAN}5.${NC} Select ${BOLD}Desktop app${NC}, name it ${BOLD}${cred_name%.json}${NC}"
   echo -e "  ${CYAN}6.${NC} Add redirect URIs: ${BOLD}http://localhost:8086/${NC} and ${BOLD}http://localhost:8088/${NC}"
   echo -e "  ${CYAN}7.${NC} Download the JSON file to ${BOLD}~/Downloads/${NC}"
   print_blank
@@ -50,12 +60,14 @@ step_google_oauth() {
 
   # Find the downloaded file
   local download_path
-  if [[ -f "$HOME/Downloads/claude-google-auth.json" ]]; then
+  if [[ -f "$HOME/Downloads/$cred_name" ]]; then
+    download_path="$HOME/Downloads/$cred_name"
+  elif [[ -f "$HOME/Downloads/claude-google-auth.json" ]]; then
     download_path="$HOME/Downloads/claude-google-auth.json"
-  elif [[ -f "$HOME/Downloads/client_secret_*.json" ]]; then
+  elif ls "$HOME/Downloads/client_secret_"*.json &>/dev/null; then
     download_path=$(ls -t "$HOME/Downloads/client_secret_"*.json 2>/dev/null | head -1)
   else
-    download_path=$(ask_input "Path to downloaded OAuth JSON" "$HOME/Downloads/claude-google-auth.json")
+    download_path=$(ask_input "Path to downloaded OAuth JSON" "$HOME/Downloads/$cred_name")
   fi
 
   if [[ ! -f "$download_path" ]]; then

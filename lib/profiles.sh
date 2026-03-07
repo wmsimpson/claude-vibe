@@ -19,14 +19,23 @@
 PROFILES_DIR="$HOME/.claude-vibe/profiles"
 ACTIVE_PROFILE_FILE="$HOME/.claude-vibe/active-profile"
 
-# Files that are per-profile
+# Files that are per-profile (oauth credential resolved dynamically)
 PROFILE_FILES=(
   "$HOME/.claude.json|claude.json"
   "$HOME/.vibe/env|env"
   "$HOME/.config/gcloud/application_default_credentials.json|gcloud-adc.json"
-  "$HOME/.config/gcloud/credentials/claude-google-auth.json|gcloud-oauth.json"
   "$HOME/.claude-vibe/gcp-project-id|gcp-project-id"
 )
+
+# Resolve the OAuth credential path for a given profile name
+_oauth_cred_path() {
+  local name="${1:-}"
+  if [[ -n "$name" ]]; then
+    echo "$HOME/.config/gcloud/credentials/${name}-google-auth.json"
+  else
+    echo "$HOME/.config/gcloud/credentials/claude-google-auth.json"
+  fi
+}
 
 # ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -65,6 +74,17 @@ _save_to_profile() {
       cp "$src" "$profile_dir/$dest"
     fi
   done
+
+  # Save the profile-specific OAuth credential
+  local oauth_src
+  oauth_src=$(_oauth_cred_path "$name")
+  # Also check the legacy/default name
+  local oauth_legacy="$HOME/.config/gcloud/credentials/claude-google-auth.json"
+  if [[ -f "$oauth_src" ]]; then
+    cp "$oauth_src" "$profile_dir/gcloud-oauth.json"
+  elif [[ -f "$oauth_legacy" ]]; then
+    cp "$oauth_legacy" "$profile_dir/gcloud-oauth.json"
+  fi
 }
 
 # Restore a profile's config files to the live locations
@@ -86,6 +106,15 @@ _restore_from_profile() {
       cp "$src_path" "$dest"
     fi
   done
+
+  # Restore the OAuth credential to the profile-named path
+  local oauth_src="$profile_dir/gcloud-oauth.json"
+  if [[ -f "$oauth_src" ]]; then
+    local oauth_dest
+    oauth_dest=$(_oauth_cred_path "$name")
+    mkdir -p "$(dirname "$oauth_dest")"
+    cp "$oauth_src" "$oauth_dest"
+  fi
 }
 
 # ── Commands ────────────────────────────────────────────────────────────────
