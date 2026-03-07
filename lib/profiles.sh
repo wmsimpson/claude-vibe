@@ -304,9 +304,7 @@ profile_switch() {
       profile_array+=("$line")
     done <<< "$profiles"
 
-    local selected
-    selected=$(ask_select "Switch to profile:" "${profile_array[@]}")
-    name="${profile_array[$?]}"
+    name=$(ask_select "Switch to profile:" "${profile_array[@]}")
   fi
 
   if ! _profile_exists "$name"; then

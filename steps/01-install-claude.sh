@@ -29,7 +29,7 @@ step_install_claude() {
     print_info "Your CPU supports AVX — both install methods will work."
     local method
     method=$(ask_select "Choose install method:" "Homebrew Cask (recommended)" "npm (universal)")
-    if [[ $? -eq 0 ]]; then
+    if [[ "$method" == "Homebrew Cask (recommended)" ]]; then
       print_step "Installing via Homebrew..."
       if run_with_spinner "Installing claude-code cask..." brew install --cask claude-code; then
         print_success "Claude Code installed via Homebrew"

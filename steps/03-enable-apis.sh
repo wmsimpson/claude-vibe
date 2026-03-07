@@ -32,9 +32,7 @@ step_enable_apis() {
     print_success "Found project: $project_id"
   else
     print_info "Multiple projects found. Select one:"
-    local selected
-    selected=$(ask_select "Choose project:" "${project_array[@]}")
-    project_id="${project_array[$?]}"
+    project_id=$(ask_select "Choose project:" "${project_array[@]}")
   fi
 
   print_blank

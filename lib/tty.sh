@@ -124,7 +124,9 @@ ask_select() {
   local selected=0
   local count=${#options[@]}
 
-  echo -e "  ${BOLD}?${NC} ${prompt} ${DIM}(↑↓ to select, enter to confirm)${NC}"
+  # All interactive UI goes to /dev/tty so it displays even when
+  # the function is called inside $(...) command substitution
+  echo -e "  ${BOLD}?${NC} ${prompt} ${DIM}(↑↓ to select, enter to confirm)${NC}" >/dev/tty
 
   # Hide cursor
   tput civis 2>/dev/null
@@ -133,9 +135,9 @@ ask_select() {
     # Draw options
     for i in "${!options[@]}"; do
       if [[ $i -eq $selected ]]; then
-        echo -e "    ${CYAN}❯ ${options[$i]}${NC}"
+        echo -e "    ${CYAN}❯ ${options[$i]}${NC}" >/dev/tty
       else
-        echo -e "    ${DIM}  ${options[$i]}${NC}"
+        echo -e "    ${DIM}  ${options[$i]}${NC}" >/dev/tty
       fi
     done
 
@@ -152,12 +154,13 @@ ask_select() {
     fi
 
     # Move cursor up to redraw
-    tput cuu "$count" 2>/dev/null
+    tput cuu "$count" 2>/dev/null >/dev/tty
   done
 
   # Show cursor
   tput cnorm 2>/dev/null
 
+  # Only the selected value goes to stdout (captured by $(...))
   echo "${options[$selected]}"
   return $selected
 }
@@ -172,7 +175,7 @@ ask_multi_select() {
   declare -a checked
   for i in "${!options[@]}"; do checked[$i]=1; done  # All checked by default
 
-  echo -e "  ${BOLD}?${NC} ${prompt} ${DIM}(↑↓ move, space toggle, enter confirm)${NC}"
+  echo -e "  ${BOLD}?${NC} ${prompt} ${DIM}(↑↓ move, space toggle, enter confirm)${NC}" >/dev/tty
 
   tput civis 2>/dev/null
 
@@ -181,9 +184,9 @@ ask_multi_select() {
       local marker="${GREEN}◉${NC}"
       [[ ${checked[$i]} -eq 0 ]] && marker="${DIM}○${NC}"
       if [[ $i -eq $selected ]]; then
-        echo -e "    ${CYAN}❯${NC} ${marker} ${options[$i]}"
+        echo -e "    ${CYAN}❯${NC} ${marker} ${options[$i]}" >/dev/tty
       else
-        echo -e "      ${marker} ${DIM}${options[$i]}${NC}"
+        echo -e "      ${marker} ${DIM}${options[$i]}${NC}" >/dev/tty
       fi
     done
 
@@ -200,7 +203,7 @@ ask_multi_select() {
       break
     fi
 
-    tput cuu "$count" 2>/dev/null
+    tput cuu "$count" 2>/dev/null >/dev/tty
   done
 
   tput cnorm 2>/dev/null
