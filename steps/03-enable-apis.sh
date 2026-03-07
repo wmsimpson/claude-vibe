@@ -10,6 +10,34 @@ step_enable_apis() {
     return 1
   fi
 
+  # Ensure the gcloud user account matches the active profile
+  local active_profile
+  active_profile=$(_get_active_profile 2>/dev/null || echo "")
+  if [[ -n "$active_profile" ]]; then
+    local profile_email=""
+    local meta_file="$PROFILES_DIR/$active_profile/profile.json"
+    if [[ -f "$meta_file" ]]; then
+      profile_email=$(python3 -c "import json; d=json.load(open('$meta_file')); print(d.get('email',''))" 2>/dev/null)
+    fi
+
+    local gcloud_account
+    gcloud_account=$(gcloud config get-value account 2>/dev/null)
+
+    if [[ -n "$profile_email" && "$gcloud_account" != "$profile_email" ]]; then
+      print_warn "gcloud is logged in as ${BOLD}$gcloud_account${NC}"
+      print_info "Active profile '${BOLD}$active_profile${NC}' uses ${BOLD}$profile_email${NC}"
+      print_blank
+      print_info "Switching gcloud account to match your profile..."
+      if ! gcloud auth login "$profile_email" --brief </dev/tty; then
+        print_error "Failed to switch gcloud account"
+        print_info "Run manually: gcloud auth login $profile_email"
+        return 1
+      fi
+      print_success "Logged in as $profile_email"
+      print_blank
+    fi
+  fi
+
   # Get project ID
   print_step "Finding your Google Cloud projects..."
   local projects
@@ -64,12 +92,6 @@ step_enable_apis() {
 
   # Set quota project
   print_step "Setting quota project..."
-
-  # Need to auth as user (not ADC) for this
-  if ! gcloud auth print-access-token &>/dev/null; then
-    print_info "Authenticating gcloud user account..."
-    gcloud auth login --brief </dev/tty
-  fi
 
   if gcloud auth application-default set-quota-project "$project_id" 2>/dev/null; then
     print_success "Quota project set to $project_id"
