@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "name": "healthcare_study_site",
+  "version": "1.0.0",
+  "description": "Clinical trial study sites with principal investigators and enrollment status",
+  "industry": "healthcare",
+  "medallion_layer": "silver",
+  "typical_rows": {"min": 100, "default": 300, "max": 1500},
+  "relationships": [
+    {"child_of": "healthcare_clinical_trial", "fk_column": "trial_id", "fk_range": [10000, 10099]},
+    {"parent_of": "healthcare_study_participant", "fk_column": "site_id", "fk_range": [20000, 20299]}
+  ],
+  "cdc": {"operations": {"APPEND": 60, "UPDATE": 35, "DELETE": 5}, "sequence_column": "operation_date"},
+  "data_quality": {"duplicate_rate": 0.0, "column_nulls": {}},
+  "columns": [
+    {
+      "name": "site_id",
+      "type": "integer",
+      "description": "Unique study site identifier",
+      "generation": {
+        "minValue": 20000,
+        "maxValue": 20299,
+        "unique": true
+      }
+    },
+    {
+      "name": "trial_id",
+      "type": "integer",
+      "description": "Foreign key to clinical trials table",
+      "generation": {
+        "minValue": 10000,
+        "maxValue": 10099,
+        "random": true
+      }
+    },
+    {
+      "name": "site_name",
+      "type": "string",
+      "description": "Name of the clinical site (derived from city)",
+      "generation": {
+        "derived": true,
+        "mimesis_base": "address.city",
+        "expr": "concat(city_base, ' Medical Center')",
+        "notes": "Uses omitted city_base column with mimesis address.city"
+      }
+    },
+    {
+      "name": "principal_investigator",
+      "type": "string",
+      "description": "Lead physician investigator at the site",
+      "pii": true,
+      "generation": {
+        "derived": true,
+        "mimesis_base": "person.full_name",
+        "expr": "concat('Dr. ', pi_name_base)",
+        "notes": "Uses omitted pi_name_base column with mimesis person.full_name"
+      }
+    },
+    {
+      "name": "phone",
+      "type": "string",
+      "description": "Site contact phone number",
+      "generation": {
+        "template": "(\\ddd) \\ddd-\\dddd"
+      }
+    },
+    {
+      "name": "site_status",
+      "type": "string",
+      "description": "Current enrollment status of the site",
+      "generation": {
+        "values": ["Active", "Enrolling", "Closed"],
+        "weights": [5, 3, 2]
+      }
+    }
+  ]
+}

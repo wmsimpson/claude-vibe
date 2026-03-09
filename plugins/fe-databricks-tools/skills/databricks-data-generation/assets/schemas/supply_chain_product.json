@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "name": "supply_chain_product",
+  "version": "2.0.0",
+  "description": "CPG product master data with categories, pricing, and packaging info",
+  "industry": "supply_chain",
+  "medallion_layer": "silver",
+  "typical_rows": {"min": 100, "default": 500, "max": 5000},
+  "relationships": [
+    {"parent_of": "supply_chain_order", "fk_column": "product_id", "fk_range": [1, 500]},
+    {"parent_of": "supply_chain_inventory_snapshot", "fk_column": "product_id", "fk_range": [1, 500]},
+    {"parent_of": "supply_chain_shipment", "fk_column": "product_id", "fk_range": [1, 500]}
+  ],
+  "columns": [
+    {
+      "name": "id",
+      "type": "long",
+      "description": "Unique product identifier",
+      "generation": {
+        "minValue": 1,
+        "unique": true
+      }
+    },
+    {
+      "name": "sku",
+      "type": "string",
+      "description": "Stock keeping unit code (SKU-000001)",
+      "generation": {
+        "expr": "concat('SKU-', lpad(cast(id as string), 6, '0'))"
+      }
+    },
+    {
+      "name": "product_name",
+      "type": "string",
+      "description": "Generated product display name",
+      "generation": {
+        "template": "\\w \\w Product"
+      }
+    },
+    {
+      "name": "category",
+      "type": "string",
+      "description": "CPG product category",
+      "generation": {
+        "values": ["Beverages", "Snacks", "Dairy", "Bakery", "Frozen Foods", "Personal Care", "Household"],
+        "random": true
+      }
+    },
+    {
+      "name": "brand",
+      "type": "string",
+      "description": "Product brand name",
+      "generation": {
+        "values": ["Premium Brand A", "Value Brand B", "Store Brand C", "Organic Brand D", "Brand E"],
+        "random": true
+      }
+    },
+    {
+      "name": "unit_cost",
+      "type": "decimal(10,2)",
+      "description": "Cost per unit",
+      "generation": {
+        "minValue": 0.5,
+        "maxValue": 50.0,
+        "random": true
+      }
+    },
+    {
+      "name": "unit_price",
+      "type": "decimal(10,2)",
+      "description": "Retail price per unit",
+      "generation": {
+        "minValue": 1.0,
+        "maxValue": 100.0,
+        "random": true
+      }
+    },
+    {
+      "name": "units_per_case",
+      "type": "integer",
+      "description": "Number of units per case pack",
+      "generation": {
+        "values": [6, 12, 24, 48],
+        "random": true
+      }
+    },
+    {
+      "name": "weight_kg",
+      "type": "decimal(8,2)",
+      "description": "Product weight in kilograms",
+      "generation": {
+        "minValue": 0.1,
+        "maxValue": 25.0,
+        "random": true
+      }
+    },
+    {
+      "name": "shelf_life_days",
+      "type": "integer",
+      "description": "Product shelf life in days",
+      "generation": {
+        "minValue": 30,
+        "maxValue": 730,
+        "random": true
+      }
+    },
+    {
+      "name": "created_date",
+      "type": "date",
+      "description": "Date product was added to catalog",
+      "generation": {
+        "begin": "2020-01-01",
+        "end": "2024-01-01",
+        "random": true
+      }
+    }
+  ]
+}

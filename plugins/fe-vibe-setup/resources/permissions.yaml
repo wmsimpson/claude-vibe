@@ -1,0 +1,52 @@
+# Claude Code Permissions Configuration
+# These permissions will be merged into  ~/.claude/settings.json
+
+allow:
+  # Base permissions
+  - "Bash"
+  - "Skill"
+
+  # File access - code directory
+  - "Read(~/code/**)"
+  - "Edit(~/code/**)"
+  - "Write(~/code/**)"
+
+  # File access - tmp directory
+  - "Read(//tmp/**)"
+  - "Edit(//tmp/**)"
+  - "Write(//tmp/**)"
+
+  # File access - vibe directory
+  - "Read(~/.vibe/**)"
+  - "Edit(~/.vibe/**)"
+  - "Write(~/.vibe/**)"
+
+  # File access - claude directory
+  - "Read(~/.claude/**)"
+
+  # File access - home directory (read only)
+  - "Read(~/**)"
+
+  # MCP tool permissions
+  - "mcp__proxy__slack__slack_write_api_call"
+
+  # Bash - allows all bash commands
+  # Note: "Bash" without parentheses allows all commands
+  # Use patterns like "Bash(npm:*)" for prefix matching specific commands
+
+  # Skills
+  - "Skill(aws-authentication)"
+  - "Skill(configure-vibe)"
+  - "Skill(databricks-authentication)"
+  - "Skill(databricks-demo)"
+  - "Skill(databricks-query)"
+  - "Skill(databricks-resource-deployment)"
+  - "Skill(databricks-warehouse-selector)"
+  - "Skill(databricks-workspace-deployment)"
+  - "Skill(gdocs-utility)"
+  - "Skill(google-docs)"
+  - "Skill(genie-rooms)"
+  - "Skill(salesforce-actions)"
+  - "Skill(salesforce-authentication)"
+
+deny: []

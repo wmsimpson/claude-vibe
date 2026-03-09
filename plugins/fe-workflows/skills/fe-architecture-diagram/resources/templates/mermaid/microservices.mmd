@@ -1,0 +1,58 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#FF3621', 'primaryTextColor': '#fff', 'primaryBorderColor': '#FF3621', 'lineColor': '#333'}}}%%
+
+flowchart TB
+    subgraph Clients["Client Layer"]
+        Web[Web App]
+        Mobile[Mobile App]
+        Partner[Partner API]
+    end
+
+    subgraph Gateway["API Gateway"]
+        GW[API Gateway<br/>Auth & Routing]
+    end
+
+    subgraph Services["Microservices"]
+        subgraph Core["Core Services"]
+            Users[User<br/>Service]
+            Orders[Order<br/>Service]
+            Products[Product<br/>Service]
+        end
+
+        subgraph Analytics["Analytics Services"]
+            Events[Event<br/>Collector]
+            Recommendations[Recommendation<br/>Engine]
+        end
+    end
+
+    subgraph Data["Data Layer"]
+        subgraph Operational["Operational DBs"]
+            UserDB[(User DB)]
+            OrderDB[(Order DB)]
+            ProductDB[(Product DB)]
+        end
+
+        subgraph Analytics_Store["Analytics Platform"]
+            Kafka[Kafka]
+            Databricks[Databricks<br/>Lakehouse]
+        end
+    end
+
+    Web --> GW
+    Mobile --> GW
+    Partner --> GW
+
+    GW --> Users
+    GW --> Orders
+    GW --> Products
+    GW --> Recommendations
+
+    Users --> UserDB
+    Orders --> OrderDB
+    Products --> ProductDB
+
+    Users --> Events
+    Orders --> Events
+    Products --> Events
+
+    Events --> Kafka --> Databricks
+    Databricks --> Recommendations

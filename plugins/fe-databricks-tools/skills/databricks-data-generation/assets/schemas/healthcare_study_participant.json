@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "name": "healthcare_study_participant",
+  "version": "1.0.0",
+  "description": "Study participants with baseline characteristics, treatment arms, and outcomes",
+  "industry": "healthcare",
+  "medallion_layer": "silver",
+  "typical_rows": {"min": 1000, "default": 3000, "max": 30000},
+  "relationships": [
+    {"child_of": "healthcare_study_site", "fk_column": "site_id", "fk_range": [20000, 20299]},
+    {"parent_of": "healthcare_adverse_event", "fk_column": "participant_id", "fk_range": [30000, 99999]},
+    {"parent_of": "healthcare_lab_measurement", "fk_column": "participant_id", "fk_range": [30000, 99999]}
+  ],
+  "cdc": {"operations": {"APPEND": 60, "UPDATE": 35, "DELETE": 5}, "sequence_column": "operation_date"},
+  "data_quality": {"duplicate_rate": 0.0, "column_nulls": {}},
+  "columns": [
+    {
+      "name": "participant_id",
+      "type": "integer",
+      "description": "Unique participant identifier",
+      "generation": {
+        "minValue": 30000,
+        "maxValue": 99999,
+        "unique": true
+      }
+    },
+    {
+      "name": "site_id",
+      "type": "integer",
+      "description": "Foreign key to study sites table",
+      "generation": {
+        "minValue": 20000,
+        "maxValue": 20299,
+        "random": true
+      }
+    },
+    {
+      "name": "subject_id",
+      "type": "string",
+      "description": "Blinded subject identifier",
+      "generation": {
+        "template": "SUBJ-#####"
+      }
+    },
+    {
+      "name": "date_of_birth",
+      "type": "date",
+      "description": "Participant date of birth",
+      "pii": true,
+      "generation": {
+        "expr": "date_add('2020-01-01', -cast(rand()*365*40 + 365*25 as int))"
+      }
+    },
+    {
+      "name": "gender",
+      "type": "string",
+      "description": "Participant gender",
+      "generation": {
+        "values": ["Male", "Female"],
+        "random": true
+      }
+    },
+    {
+      "name": "treatment_arm",
+      "type": "string",
+      "description": "Randomized treatment assignment",
+      "generation": {
+        "values": ["Active Drug", "Placebo"],
+        "weights": [6, 4]
+      }
+    },
+    {
+      "name": "baseline_weight_kg",
+      "type": "double",
+      "description": "Baseline body weight in kilograms",
+      "generation": {
+        "expr": "55 + rand() * 70"
+      }
+    },
+    {
+      "name": "baseline_bmi",
+      "type": "double",
+      "description": "Baseline body mass index",
+      "generation": {
+        "expr": "18.5 + rand() * 18"
+      }
+    },
+    {
+      "name": "baseline_disease_severity",
+      "type": "string",
+      "description": "Disease severity at enrollment",
+      "generation": {
+        "values": ["Mild", "Moderate", "Severe"],
+        "weights": [3, 5, 2]
+      }
+    },
+    {
+      "name": "prior_treatments",
+      "type": "integer",
+      "description": "Number of prior treatment lines (severity-dependent)",
+      "generation": {
+        "baseColumn": "baseline_disease_severity",
+        "expr": "CASE WHEN baseline_disease_severity = 'Mild' THEN cast(rand() * 2 as int) WHEN baseline_disease_severity = 'Moderate' THEN cast(1 + rand() * 3 as int) ELSE cast(2 + rand() * 4 as int) END"
+      }
+    },
+    {
+      "name": "enrollment_date",
+      "type": "date",
+      "description": "Date participant enrolled in the trial",
+      "generation": {
+        "expr": "date_add('2020-01-01', cast(rand()*datediff('2024-12-31', '2020-01-01') as int))"
+      }
+    },
+    {
+      "name": "completion_status",
+      "type": "string",
+      "description": "Participant completion status",
+      "generation": {
+        "values": ["Completed", "Ongoing", "Discontinued", "Lost to Follow-up"],
+        "weights": [6, 2, 1.5, 0.5]
+      }
+    }
+  ]
+}

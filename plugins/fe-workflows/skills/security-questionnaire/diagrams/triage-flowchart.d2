@@ -1,0 +1,126 @@
+direction: down
+
+title: Triage Decision Tree {
+  shape: text
+  style.font-size: 20
+}
+
+start: "Receive Security\nQuestionnaire" {
+  shape: oval
+  style.fill: "#e3f2fd"
+}
+
+nda: "Customer has\nsigned NDA?" {
+  shape: diamond
+  style.fill: "#fff9c4"
+}
+
+stop_nda: "STOP\nRequest NDA first" {
+  shape: hexagon
+  style.fill: "#ff4444"
+  style.font-color: white
+}
+
+azure: "Is this Azure\nDatabricks?" {
+  shape: diamond
+  style.fill: "#fff9c4"
+}
+
+hard_stop: "HARD STOP\nRoute to Azure team\ngo/sqrc/azure" {
+  shape: hexagon
+  style.fill: "#ff4444"
+  style.font-color: white
+}
+
+avoid: "Can customer accept\npre-built content?" {
+  shape: diamond
+  style.fill: "#fff9c4"
+}
+
+prebuilt: "Provide:\n- go/scpackage\n- go/sig\n- Trust Center" {
+  shape: rectangle
+  style.fill: "#c8e6c9"
+}
+
+sqrc: "Can go/sqrc\nanswer it?" {
+  shape: diamond
+  style.fill: "#fff9c4"
+}
+
+use_sqrc: "Use SQRC answers\nCopy-paste directly" {
+  shape: rectangle
+  style.fill: "#c8e6c9"
+}
+
+esg: "ESG or Privacy\nfocused?" {
+  shape: diamond
+  style.fill: "#fff9c4"
+}
+
+esg_team: "Route to\nESG Team" {
+  shape: rectangle
+  style.fill: "#e1bee7"
+}
+
+privacy_team: "Route to\nPrivacy Team" {
+  shape: rectangle
+  style.fill: "#e1bee7"
+}
+
+deal: "Deal value\n>= 250K?" {
+  shape: diamond
+  style.fill: "#fff9c4"
+}
+
+submit: "Submit via\ngo/sqrc/submitform" {
+  shape: rectangle
+  style.fill: "#ffe0b2"
+}
+
+self_service: "Self-service:\ngo/sqrc + This Skill" {
+  shape: rectangle
+  style.fill: "#b3e5fc"
+}
+
+validate: "Run sqrc-validator\nbefore sharing" {
+  shape: rectangle
+  style.fill: "#ffe0b2"
+}
+
+complete: "Complete" {
+  shape: oval
+  style.fill: "#c8e6c9"
+}
+
+# Connections
+start -> nda
+
+nda -> stop_nda: "No"
+nda -> azure: "Yes"
+
+azure -> hard_stop: "Yes"
+azure -> avoid: "No"
+
+avoid -> prebuilt: "Yes"
+avoid -> sqrc: "No"
+
+prebuilt -> complete
+
+sqrc -> use_sqrc: "Yes - All"
+sqrc -> esg: "Partial/No"
+
+use_sqrc -> validate
+
+esg -> esg_team: "ESG"
+esg -> privacy_team: "Privacy"
+esg -> deal: "Neither"
+
+esg_team -> complete
+privacy_team -> complete
+
+deal -> submit: "Yes"
+deal -> self_service: "No"
+
+submit -> complete
+self_service -> validate
+validate -> complete

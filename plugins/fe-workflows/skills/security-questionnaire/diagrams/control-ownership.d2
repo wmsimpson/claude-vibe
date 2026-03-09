@@ -1,0 +1,45 @@
+direction: right
+
+title: Databricks vs CSP Control Ownership {
+  shape: text
+  style.font-size: 20
+}
+
+databricks: "Databricks-Owned Controls" {
+  style.fill: "#e3f2fd"
+  style.stroke: "#1976d2"
+  style.stroke-width: 2
+
+  items: |md
+    - ISO 27001/27017/27018/27701
+    - SOC 1/2 Type II reports
+    - PCI-DSS attestation
+    - HIPAA compliance
+    - Security policies
+    - Incident response (SIRT)
+    - Penetration testing
+    - SDLC & vulnerability mgmt
+    - Access control & auth
+    - Encryption implementation
+    - Audit logging
+  |
+}
+
+csp: "CSP-Inherited Controls" {
+  style.fill: "#fff3e0"
+  style.stroke: "#ff9800"
+  style.stroke-width: 2
+
+  items: |md
+    - Physical data center security
+    - Physical media destruction
+    - Network infrastructure redundancy
+    - Geographic availability zones
+    - Power & cooling
+    - Physical access controls
+  |
+}
+
+databricks <-> csp: "Clearly distinguish\nin responses" {
+  style.stroke-dash: 3
+}

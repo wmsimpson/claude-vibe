@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "name": "healthcare_clinical_trial",
+  "version": "1.0.0",
+  "description": "Clinical trial protocols with phase, therapeutic area, and enrollment targets",
+  "industry": "healthcare",
+  "medallion_layer": "silver",
+  "typical_rows": {"min": 50, "default": 100, "max": 500},
+  "relationships": [
+    {"parent_of": "healthcare_study_site", "fk_column": "trial_id", "fk_range": [10000, 10099]}
+  ],
+  "cdc": {"operations": {"APPEND": 70, "UPDATE": 25, "DELETE": 5}, "sequence_column": "operation_date"},
+  "data_quality": {"duplicate_rate": 0.0, "column_nulls": {}},
+  "columns": [
+    {
+      "name": "trial_id",
+      "type": "integer",
+      "description": "Unique trial identifier",
+      "generation": {
+        "minValue": 10000,
+        "maxValue": 10099,
+        "unique": true
+      }
+    },
+    {
+      "name": "nct_number",
+      "type": "string",
+      "description": "ClinicalTrials.gov registry number",
+      "generation": {
+        "template": "NCT########"
+      }
+    },
+    {
+      "name": "sponsor_company",
+      "type": "string",
+      "description": "Pharmaceutical company sponsoring the trial",
+      "generation": {
+        "mimesis": "business.company"
+      }
+    },
+    {
+      "name": "phase",
+      "type": "string",
+      "description": "Clinical trial phase",
+      "generation": {
+        "values": ["Phase I", "Phase II", "Phase III", "Phase IV"],
+        "random": true
+      }
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "description": "Current trial status",
+      "generation": {
+        "values": ["Active", "Completed", "Suspended", "Terminated"],
+        "random": true
+      }
+    },
+    {
+      "name": "therapeutic_area",
+      "type": "string",
+      "description": "Disease area under investigation",
+      "generation": {
+        "values": ["Oncology", "Cardiology", "Neurology", "Immunology", "Endocrinology", "Rheumatology"],
+        "random": true
+      }
+    },
+    {
+      "name": "study_drug",
+      "type": "string",
+      "description": "Investigational drug being tested",
+      "generation": {
+        "values": [
+          "Pembrolizumab", "Nivolumab", "Atezolizumab", "Durvalumab",
+          "Atorvastatin", "Rosuvastatin", "Evolocumab", "Alirocumab",
+          "Lecanemab", "Aducanumab", "Donepezil", "Memantine",
+          "Adalimumab", "Etanercept", "Infliximab", "Tocilizumab",
+          "Semaglutide", "Tirzepatide", "Empagliflozin", "Dapagliflozin"
+        ],
+        "random": true
+      }
+    },
+    {
+      "name": "trial_title",
+      "type": "string",
+      "description": "Descriptive title of the clinical trial",
+      "generation": {
+        "baseColumn": ["study_drug", "therapeutic_area"],
+        "expr": "concat('Study of ', study_drug, ' in ', therapeutic_area)"
+      }
+    },
+    {
+      "name": "target_enrollment",
+      "type": "integer",
+      "description": "Target number of participants (phase-dependent)",
+      "generation": {
+        "baseColumn": "phase",
+        "expr": "CASE WHEN phase = 'Phase I' THEN cast(20 + rand() * 60 as int) WHEN phase = 'Phase II' THEN cast(100 + rand() * 200 as int) WHEN phase = 'Phase III' THEN cast(500 + rand() * 1500 as int) ELSE cast(200 + rand() * 800 as int) END"
+      }
+    }
+  ]
+}

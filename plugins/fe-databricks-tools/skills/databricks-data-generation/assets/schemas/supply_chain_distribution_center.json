@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "name": "supply_chain_distribution_center",
+  "version": "2.0.0",
+  "description": "Distribution center network with capacity, utilization, and geographic data",
+  "industry": "supply_chain",
+  "medallion_layer": "silver",
+  "typical_rows": {"min": 5, "default": 25, "max": 200},
+  "relationships": [
+    {"parent_of": "supply_chain_store", "fk_column": "distribution_center_id", "fk_range": [1, 25]},
+    {"parent_of": "supply_chain_order", "fk_column": "distribution_center_id", "fk_range": [1, 25]},
+    {"parent_of": "supply_chain_shipment", "fk_column": "origin_distribution_center_id", "fk_range": [1, 25]}
+  ],
+  "columns": [
+    {
+      "name": "id",
+      "type": "long",
+      "description": "Unique distribution center identifier",
+      "generation": {
+        "minValue": 1,
+        "unique": true
+      }
+    },
+    {
+      "name": "distribution_center_code",
+      "type": "string",
+      "description": "Distribution center code (DC-0001)",
+      "generation": {
+        "expr": "concat('DC-', lpad(cast(id as string), 4, '0'))"
+      }
+    },
+    {
+      "name": "distribution_center_name",
+      "type": "string",
+      "description": "Facility display name",
+      "generation": {
+        "template": "\\w Distribution Center"
+      }
+    },
+    {
+      "name": "region",
+      "type": "string",
+      "description": "US geographic region",
+      "generation": {
+        "values": ["Northeast", "Southeast", "Midwest", "Southwest", "West"],
+        "random": true
+      }
+    },
+    {
+      "name": "capacity_pallets",
+      "type": "integer",
+      "description": "Maximum pallet storage capacity",
+      "generation": {
+        "minValue": 5000,
+        "maxValue": 50000,
+        "random": true
+      }
+    },
+    {
+      "name": "current_utilization_pct",
+      "type": "decimal(5,2)",
+      "description": "Current capacity utilization percentage",
+      "generation": {
+        "minValue": 45.0,
+        "maxValue": 95.0,
+        "random": true
+      }
+    },
+    {
+      "name": "latitude",
+      "type": "decimal(9,6)",
+      "description": "Geographic latitude (US range)",
+      "generation": {
+        "minValue": 25.0,
+        "maxValue": 49.0,
+        "random": true
+      }
+    },
+    {
+      "name": "longitude",
+      "type": "decimal(9,6)",
+      "description": "Geographic longitude (US range)",
+      "generation": {
+        "minValue": -125.0,
+        "maxValue": -65.0,
+        "random": true
+      }
+    },
+    {
+      "name": "operating_cost_daily",
+      "type": "decimal(10,2)",
+      "description": "Daily facility operating cost",
+      "generation": {
+        "minValue": 5000,
+        "maxValue": 50000,
+        "random": true
+      }
+    },
+    {
+      "name": "opened_date",
+      "type": "date",
+      "description": "Date facility became operational",
+      "generation": {
+        "begin": "2015-01-01",
+        "end": "2023-01-01",
+        "random": true
+      }
+    }
+  ]
+}

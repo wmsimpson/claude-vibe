@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "name": "supply_chain_store",
+  "version": "2.0.0",
+  "description": "Retail store locations with format, region, and distribution center assignment",
+  "industry": "supply_chain",
+  "medallion_layer": "silver",
+  "typical_rows": {"min": 100, "default": 1000, "max": 10000},
+  "relationships": [
+    {"child_of": "supply_chain_distribution_center", "fk_column": "distribution_center_id", "fk_range": [1, 25]}
+  ],
+  "columns": [
+    {
+      "name": "id",
+      "type": "long",
+      "description": "Unique store identifier",
+      "generation": {
+        "minValue": 1,
+        "unique": true
+      }
+    },
+    {
+      "name": "store_code",
+      "type": "string",
+      "description": "Store code (STORE-000001)",
+      "generation": {
+        "expr": "concat('STORE-', lpad(cast(id as string), 6, '0'))"
+      }
+    },
+    {
+      "name": "retailer",
+      "type": "string",
+      "description": "Retailer chain name",
+      "generation": {
+        "values": ["RetailCo", "MegaMart", "QuickStop", "FreshGrocer", "ValueMart"],
+        "random": true
+      }
+    },
+    {
+      "name": "store_format",
+      "type": "string",
+      "description": "Store type/format",
+      "generation": {
+        "values": ["Hypermarket", "Supermarket", "Convenience", "Online", "Club Store"],
+        "random": true
+      }
+    },
+    {
+      "name": "region",
+      "type": "string",
+      "description": "US geographic region",
+      "generation": {
+        "values": ["Northeast", "Southeast", "Midwest", "Southwest", "West"],
+        "random": true
+      }
+    },
+    {
+      "name": "square_footage",
+      "type": "integer",
+      "description": "Store floor area in square feet",
+      "generation": {
+        "minValue": 2000,
+        "maxValue": 200000,
+        "random": true
+      }
+    },
+    {
+      "name": "distribution_center_id",
+      "type": "integer",
+      "description": "Foreign key to distribution_centers table",
+      "generation": {
+        "minValue": 1,
+        "maxValue": 25,
+        "random": true
+      }
+    },
+    {
+      "name": "latitude",
+      "type": "decimal(9,6)",
+      "description": "Geographic latitude (US range)",
+      "generation": {
+        "minValue": 25.0,
+        "maxValue": 49.0,
+        "random": true
+      }
+    },
+    {
+      "name": "longitude",
+      "type": "decimal(9,6)",
+      "description": "Geographic longitude (US range)",
+      "generation": {
+        "minValue": -125.0,
+        "maxValue": -65.0,
+        "random": true
+      }
+    },
+    {
+      "name": "opened_date",
+      "type": "date",
+      "description": "Date store opened",
+      "generation": {
+        "begin": "2010-01-01",
+        "end": "2024-01-01",
+        "random": true
+      }
+    }
+  ]
+}

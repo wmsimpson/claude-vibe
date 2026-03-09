@@ -1,0 +1,10 @@
+{
+  "name": "lean-sigma-tools",
+  "description": "Lean Six Sigma process improvement tools for Field Engineering — generate SIPOC diagrams, FMEA risk tables, and swimlane process maps grounded in the Databricks Well-Architected Framework",
+  "version": "1.0.0",
+  "author": {
+    "name": "Craig Lukasik"
+  },
+  "keywords": ["lean", "six-sigma", "DMAIC", "SIPOC", "FMEA", "process-map", "well-architected", "databricks"],
+  "skills": "./skills/"
+}

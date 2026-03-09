@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "name": "supply_chain_order",
+  "version": "2.0.0",
+  "description": "Manufacturing/purchase orders with schedule tracking and production metrics",
+  "industry": "supply_chain",
+  "medallion_layer": "silver",
+  "typical_rows": {"min": 1000, "default": 10000, "max": 100000},
+  "relationships": [
+    {"child_of": "supply_chain_distribution_center", "fk_column": "distribution_center_id", "fk_range": [1, 25]},
+    {"child_of": "supply_chain_product", "fk_column": "product_id", "fk_range": [1, 500]}
+  ],
+  "columns": [
+    {
+      "name": "id",
+      "type": "long",
+      "description": "Unique order identifier",
+      "generation": {
+        "minValue": 1,
+        "unique": true
+      }
+    },
+    {
+      "name": "order_number",
+      "type": "string",
+      "description": "Purchase order number (PO-00000001)",
+      "generation": {
+        "expr": "concat('PO-', lpad(cast(id as string), 8, '0'))"
+      }
+    },
+    {
+      "name": "distribution_center_id",
+      "type": "integer",
+      "description": "Foreign key to distribution_centers table",
+      "generation": {
+        "minValue": 1,
+        "maxValue": 25,
+        "random": true
+      }
+    },
+    {
+      "name": "product_id",
+      "type": "integer",
+      "description": "Foreign key to products table",
+      "generation": {
+        "minValue": 1,
+        "maxValue": 500,
+        "random": true
+      }
+    },
+    {
+      "name": "order_date",
+      "type": "timestamp",
+      "description": "Order creation timestamp",
+      "generation": {
+        "begin": "2024-01-01 00:00:00",
+        "end": "2025-09-29 23:59:59",
+        "random": true
+      }
+    },
+    {
+      "name": "scheduled_start",
+      "type": "date",
+      "description": "Planned production start date (post-processing: date_add from order_date)",
+      "generation": {
+        "post_processing": true,
+        "note": "Derived via date_add(order_date, scheduled_start_days)"
+      }
+    },
+    {
+      "name": "scheduled_end",
+      "type": "date",
+      "description": "Planned production end date (post-processing: date_add from scheduled_start)",
+      "generation": {
+        "post_processing": true,
+        "note": "Derived via date_add(scheduled_start, scheduled_duration_days)"
+      }
+    },
+    {
+      "name": "actual_start",
+      "type": "timestamp",
+      "description": "Actual production start (post-processing, nullable based on probability)",
+      "generation": {
+        "post_processing": true,
+        "note": "Conditional on start_probability > 0.3"
+      }
+    },
+    {
+      "name": "actual_end",
+      "type": "timestamp",
+      "description": "Actual production end (post-processing, nullable based on probability)",
+      "generation": {
+        "post_processing": true,
+        "note": "Conditional on actual_start not null and completion_probability > 0.2"
+      }
+    },
+    {
+      "name": "quantity_ordered",
+      "type": "integer",
+      "description": "Units ordered",
+      "generation": {
+        "minValue": 500,
+        "maxValue": 50000,
+        "random": true
+      }
+    },
+    {
+      "name": "quantity_produced",
+      "type": "integer",
+      "description": "Units actually produced (post-processing, 0 if not completed)",
+      "generation": {
+        "post_processing": true,
+        "note": "quantity_ordered * order_variance when actual_end is not null"
+      }
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "description": "Order status (post-processing via modulo mapping)",
+      "generation": {
+        "post_processing": true,
+        "values": ["Scheduled", "In Progress", "Completed", "Delayed", "Quality Hold"],
+        "note": "Mapped from status_rand % 5"
+      }
+    },
+    {
+      "name": "line_efficiency_pct",
+      "type": "decimal(5,2)",
+      "description": "Production line efficiency percentage",
+      "generation": {
+        "minValue": 75.0,
+        "maxValue": 98.0,
+        "random": true
+      }
+    },
+    {
+      "name": "production_cost",
+      "type": "decimal(12,2)",
+      "description": "Total production cost",
+      "generation": {
+        "minValue": 5000,
+        "maxValue": 500000,
+        "random": true
+      }
+    }
+  ]
+}

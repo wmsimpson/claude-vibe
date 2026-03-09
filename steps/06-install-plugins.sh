@@ -1,31 +1,13 @@
 #!/usr/bin/env bash
 # Step 6: Install Claude Code Plugins
 
-PLUGIN_REPO_URL="https://github.com/wsimpsonjr/individual-vibe-tool"
-PLUGIN_REPO_DIR="$HOME/individual-vibe-tool"
-
 step_install_plugins() {
   print_header "Step 6 of 8 — Claude Code Plugins"
 
-  print_info "Installing plugin collections for Google Workspace, app dev, workflows, and more."
-  print_info "Source: $PLUGIN_REPO_URL"
+  print_info "Installing plugin collections from claude-vibe."
   print_blank
 
-  # Clone or update plugin repo
-  if [[ -d "$PLUGIN_REPO_DIR/plugins" ]]; then
-    print_success "Plugin repo found at $PLUGIN_REPO_DIR"
-  else
-    print_step "Cloning plugin repo..."
-    if run_with_spinner "Cloning individual-vibe-tool..." git clone "$PLUGIN_REPO_URL" "$PLUGIN_REPO_DIR"; then
-      print_success "Plugin repo cloned"
-    else
-      print_error "Failed to clone plugin repo"
-      print_info "Clone manually: git clone $PLUGIN_REPO_URL $PLUGIN_REPO_DIR"
-      return 1
-    fi
-  fi
-
-  # Select which plugins to install
+  # All plugins available in this repo
   local all_plugins=(
     "fe-google-tools"
     "fe-app-dev"
@@ -69,16 +51,22 @@ step_install_plugins() {
     done
   fi
 
-  # Install selected plugins
+  # Install selected plugins from this repo
   print_blank
   local installed=0
   for plugin in "${selected_plugins[@]}"; do
     print_step "Installing $plugin..."
-    if claude plugin install "${plugin}@individual-vibe-tool" &>/dev/null; then
+    if claude plugin install "${plugin}@claude-vibe" &>/dev/null; then
       print_success "$plugin"
       ((installed++))
     else
-      print_error "$plugin — install failed"
+      # Fallback: install from local path directly
+      if claude plugin install "${plugin}@${VIBE_HOME}" &>/dev/null; then
+        print_success "$plugin (local)"
+        ((installed++))
+      else
+        print_error "$plugin — install failed"
+      fi
     fi
   done
 
@@ -89,12 +77,13 @@ step_install_plugins() {
   print_blank
   print_step "Syncing skill permissions..."
 
-  if [[ -f "$PLUGIN_REPO_DIR/permissions.yaml" ]]; then
+  local perms_file="$VIBE_HOME/permissions.yaml"
+  if [[ -f "$perms_file" ]]; then
     python3 -c "
 import json, os, subprocess
 
 result = subprocess.run(
-    ['yq', '-o=json', os.path.expanduser('$PLUGIN_REPO_DIR/permissions.yaml')],
+    ['yq', '-o=json', '$perms_file'],
     capture_output=True, text=True
 )
 new_perms = json.loads(result.stdout).get('allow', [])
@@ -124,7 +113,7 @@ print(f'{len(merged)} total, {skill_count} skills')
       print_error "Permission sync failed — run manually after install"
     fi
   else
-    print_warn "permissions.yaml not found — skipping permission sync"
+    print_warn "permissions.yaml not found at $perms_file"
   fi
 
   mark_step_complete "install_plugins"

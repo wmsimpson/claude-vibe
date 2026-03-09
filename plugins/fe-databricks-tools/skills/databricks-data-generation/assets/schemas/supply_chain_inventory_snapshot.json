@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "name": "supply_chain_inventory_snapshot",
+  "version": "2.0.0",
+  "description": "Multi-echelon inventory snapshots with stock levels, demand metrics, and risk classification",
+  "industry": "supply_chain",
+  "medallion_layer": "silver",
+  "typical_rows": {"min": 5000, "default": 50000, "max": 500000},
+  "relationships": [
+    {"child_of": "supply_chain_product", "fk_column": "product_id", "fk_range": [1, 500]}
+  ],
+  "columns": [
+    {
+      "name": "id",
+      "type": "long",
+      "description": "Unique inventory snapshot identifier",
+      "generation": {
+        "minValue": 1,
+        "unique": true
+      }
+    },
+    {
+      "name": "snapshot_date",
+      "type": "date",
+      "description": "Date of inventory snapshot",
+      "generation": {
+        "begin": "2024-01-01",
+        "end": "2025-09-29",
+        "random": true
+      }
+    },
+    {
+      "name": "location_type",
+      "type": "string",
+      "description": "Location type (distribution_center or Store)",
+      "generation": {
+        "note": "Weighted via seed column: 30% distribution_center, 70% Store",
+        "expr": "CASE WHEN location_type_seed < 0.3 THEN 'distribution_center' ELSE 'Store' END"
+      }
+    },
+    {
+      "name": "location_id",
+      "type": "integer",
+      "description": "Foreign key to distribution_centers or stores based on location_type",
+      "generation": {
+        "expr": "CASE WHEN location_type = 'distribution_center' THEN (id % 25) + 1 ELSE (id % 1000) + 1 END"
+      }
+    },
+    {
+      "name": "product_id",
+      "type": "integer",
+      "description": "Foreign key to products table",
+      "generation": {
+        "minValue": 1,
+        "maxValue": 500,
+        "random": true
+      }
+    },
+    {
+      "name": "quantity_on_hand",
+      "type": "integer",
+      "description": "Total units currently in stock",
+      "generation": {
+        "minValue": 0,
+        "maxValue": 10000,
+        "random": true
+      }
+    },
+    {
+      "name": "quantity_reserved",
+      "type": "integer",
+      "description": "Units reserved for pending orders",
+      "generation": {
+        "expr": "cast(quantity_on_hand * reserve_factor as int)",
+        "note": "reserve_factor is an omitted seed column (0 to 0.5)"
+      }
+    },
+    {
+      "name": "quantity_available",
+      "type": "integer",
+      "description": "Units available for new orders",
+      "generation": {
+        "expr": "quantity_on_hand - quantity_reserved"
+      }
+    },
+    {
+      "name": "reorder_point",
+      "type": "integer",
+      "description": "Stock level that triggers reorder",
+      "generation": {
+        "minValue": 100,
+        "maxValue": 2000,
+        "random": true
+      }
+    },
+    {
+      "name": "daily_demand",
+      "type": "double",
+      "description": "Average daily demand rate",
+      "generation": {
+        "minValue": 50.0,
+        "maxValue": 150.0,
+        "random": true
+      }
+    },
+    {
+      "name": "days_of_supply",
+      "type": "decimal(8,2)",
+      "description": "Days of inventory coverage (safe division)",
+      "generation": {
+        "expr": "CASE WHEN daily_demand > 0 THEN cast(quantity_available / daily_demand as decimal(8,2)) ELSE NULL END"
+      }
+    },
+    {
+      "name": "inventory_value",
+      "type": "decimal(12,2)",
+      "description": "Dollar value of inventory on hand",
+      "generation": {
+        "minValue": 1000,
+        "maxValue": 500000,
+        "random": true
+      }
+    },
+    {
+      "name": "last_received_date",
+      "type": "date",
+      "description": "Date of last inventory receipt",
+      "generation": {
+        "expr": "date_sub(snapshot_date, days_offset)",
+        "note": "days_offset is an omitted seed column (0 to 60)"
+      }
+    },
+    {
+      "name": "stockout_risk",
+      "type": "string",
+      "description": "Stockout risk classification",
+      "generation": {
+        "expr": "CASE WHEN days_of_supply IS NULL OR days_of_supply < 3 THEN 'High' WHEN days_of_supply < 7 THEN 'Medium' ELSE 'Low' END"
+      }
+    }
+  ]
+}

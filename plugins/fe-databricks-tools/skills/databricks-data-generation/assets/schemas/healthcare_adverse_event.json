@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "name": "healthcare_adverse_event",
+  "version": "1.0.0",
+  "description": "Adverse events correlated with treatment severity and study drug",
+  "industry": "healthcare",
+  "medallion_layer": "silver",
+  "typical_rows": {"min": 500, "default": 2000, "max": 20000},
+  "relationships": [
+    {"child_of": "healthcare_study_participant", "fk_column": "participant_id", "fk_range": [30000, 99999]}
+  ],
+  "cdc": {"operations": {"APPEND": 80, "UPDATE": 15, "DELETE": 5}, "sequence_column": "operation_date"},
+  "data_quality": {"duplicate_rate": 0.0, "column_nulls": {}},
+  "columns": [
+    {
+      "name": "ae_id",
+      "type": "integer",
+      "description": "Unique adverse event identifier",
+      "generation": {
+        "minValue": 40000,
+        "maxValue": 99999,
+        "unique": true
+      }
+    },
+    {
+      "name": "participant_id",
+      "type": "integer",
+      "description": "Foreign key to study participants table",
+      "generation": {
+        "minValue": 30000,
+        "maxValue": 32999,
+        "random": true,
+        "notes": "maxValue is dynamically set to 30000 + n_participants - 1"
+      }
+    },
+    {
+      "name": "ae_term",
+      "type": "string",
+      "description": "MedDRA preferred term for the adverse event",
+      "generation": {
+        "values": ["Nausea", "Headache", "Fatigue", "Dizziness", "Injection Site Reaction", "Diarrhea"],
+        "weights": [3, 2.5, 3, 1.5, 2, 2]
+      }
+    },
+    {
+      "name": "severity",
+      "type": "string",
+      "description": "Adverse event severity grade",
+      "generation": {
+        "values": ["Mild", "Moderate", "Severe"],
+        "weights": [6, 3, 1]
+      }
+    },
+    {
+      "name": "onset_day",
+      "type": "integer",
+      "description": "Day of onset relative to treatment start (severity-dependent)",
+      "generation": {
+        "baseColumn": "severity",
+        "expr": "CASE WHEN severity = 'Severe' THEN cast(1 + rand() * 30 as int) WHEN severity = 'Moderate' THEN cast(1 + rand() * 90 as int) ELSE cast(1 + rand() * 180 as int) END"
+      }
+    },
+    {
+      "name": "resolution_days",
+      "type": "integer",
+      "description": "Number of days to resolution (severity-dependent)",
+      "generation": {
+        "baseColumn": "severity",
+        "expr": "CASE WHEN severity = 'Severe' THEN cast(7 + rand() * 21 as int) WHEN severity = 'Moderate' THEN cast(3 + rand() * 10 as int) ELSE cast(1 + rand() * 5 as int) END"
+      }
+    },
+    {
+      "name": "related_to_study_drug",
+      "type": "boolean",
+      "description": "Whether the AE is related to the study drug (probability increases with severity)",
+      "generation": {
+        "baseColumn": "severity",
+        "expr": "CASE WHEN severity = 'Severe' THEN rand() < 0.7 WHEN severity = 'Moderate' THEN rand() < 0.5 ELSE rand() < 0.3 END"
+      }
+    },
+    {
+      "name": "action_taken",
+      "type": "string",
+      "description": "Clinical action taken in response (nested CASE on severity)",
+      "generation": {
+        "baseColumn": "severity",
+        "expr": "CASE WHEN severity = 'Severe' THEN CASE WHEN rand() < 0.6 THEN 'Dose Reduced' WHEN rand() < 0.8 THEN 'Treatment Interrupted' ELSE 'Treatment Discontinued' END WHEN severity = 'Moderate' THEN CASE WHEN rand() < 0.5 THEN 'Dose Reduced' WHEN rand() < 0.8 THEN 'No Action' ELSE 'Treatment Interrupted' END ELSE 'No Action' END"
+      }
+    },
+    {
+      "name": "ae_description",
+      "type": "string",
+      "description": "Free-text description of the adverse event",
+      "generation": {
+        "baseColumn": ["ae_term", "severity"],
+        "expr": "concat(ae_term, ': ', lower(severity), '. Reported on day ', cast(onset_day as string), ' of treatment.')",
+        "notes": "Uses a hidden report_day helper column in generator for the day reference"
+      }
+    }
+  ]
+}

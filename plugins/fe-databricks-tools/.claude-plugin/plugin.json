@@ -1,0 +1,10 @@
+{
+  "name": "fe-databricks-tools",
+  "description": "Complete Databricks workflow tools: authentication, queries, deployments, workspace setup, and demos",
+  "version": "1.0.6",
+  "author": {
+    "name": "Databricks Field Engineering"
+  },
+  "skills": "./skills/",
+  "commands": "./commands/"
+}

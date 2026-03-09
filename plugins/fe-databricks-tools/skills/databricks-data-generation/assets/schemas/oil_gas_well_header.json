@@ -1,0 +1,208 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "name": "oil_gas_well_header",
+  "version": "1.0.0",
+  "description": "Oil & gas well header data with ARPS decline curve parameters for Permian Basin horizontal wells",
+  "industry": "oil_gas",
+  "medallion_layer": "silver",
+  "typical_rows": {"min": 10, "default": 50, "max": 500, "note": "per formation; multiply by number of formations for total"},
+  "generation_pattern": "per_formation_union",
+  "formation_parameters": {
+    "FORMATION_A": {"q_i": 6000, "d": 0.01, "b": 0.8},
+    "FORMATION_B": {"q_i": 7000, "d": 0.011, "b": 0.7},
+    "FORMATION_C": {"q_i": 5500, "d": 0.009, "b": 0.8},
+    "FORMATION_D": {"q_i": 5750, "d": 0.011, "b": 0.7}
+  },
+  "relationships": [
+    {"parent_of": "oil_gas_daily_production", "fk_column": "API_NUMBER", "fk_range": [42000000000000, 42999999999999]},
+    {"parent_of": "oil_gas_type_curve", "fk_column": "PRODUCING_FORMATION", "fk_values": ["FORMATION_A", "FORMATION_B", "FORMATION_C", "FORMATION_D"]}
+  ],
+  "columns": [
+    {
+      "name": "API_NUMBER",
+      "type": "bigint",
+      "description": "API well number (Texas 42-series)",
+      "generation": {
+        "minValue": 42000000000000,
+        "maxValue": 42999999999999,
+        "random": true
+      }
+    },
+    {
+      "name": "FIELD_NAME",
+      "type": "string",
+      "description": "Producing field name",
+      "generation": {
+        "values": ["Field_1", "Field_2", "Field_3", "Field_4", "Field_5"],
+        "random": true
+      }
+    },
+    {
+      "name": "LATITUDE",
+      "type": "float",
+      "description": "Surface latitude (Permian Basin)",
+      "generation": {
+        "minValue": 31.00,
+        "maxValue": 32.50,
+        "step": 1e-6,
+        "random": true
+      }
+    },
+    {
+      "name": "LONGITUDE",
+      "type": "float",
+      "description": "Surface longitude (Permian Basin)",
+      "generation": {
+        "minValue": -104.00,
+        "maxValue": -101.00,
+        "step": 1e-6,
+        "random": true
+      }
+    },
+    {
+      "name": "COUNTY",
+      "type": "string",
+      "description": "Texas county",
+      "generation": {
+        "values": ["Reeves", "Midland", "Ector", "Loving", "Ward"],
+        "random": true
+      }
+    },
+    {
+      "name": "STATE",
+      "type": "string",
+      "description": "State",
+      "generation": {
+        "values": ["Texas"]
+      }
+    },
+    {
+      "name": "COUNTRY",
+      "type": "string",
+      "description": "Country",
+      "generation": {
+        "values": ["USA"]
+      }
+    },
+    {
+      "name": "WELL_TYPE",
+      "type": "string",
+      "description": "Well type classification",
+      "generation": {
+        "values": ["Oil"]
+      }
+    },
+    {
+      "name": "WELL_ORIENTATION",
+      "type": "string",
+      "description": "Drilling orientation",
+      "generation": {
+        "values": ["Horizontal"]
+      }
+    },
+    {
+      "name": "PRODUCING_FORMATION",
+      "type": "string",
+      "description": "Target producing formation (set per formation loop)",
+      "generation": {
+        "values": ["__FORMATION_NAME__"],
+        "note": "Replaced dynamically per formation in generation loop"
+      }
+    },
+    {
+      "name": "CURRENT_STATUS",
+      "type": "string",
+      "description": "Current well status",
+      "generation": {
+        "values": ["Producing", "Shut-in", "Plugged and Abandoned", "Planned"],
+        "weights": [80, 10, 5, 5],
+        "random": true
+      }
+    },
+    {
+      "name": "TOTAL_DEPTH",
+      "type": "integer",
+      "description": "Total measured depth in feet",
+      "generation": {
+        "minValue": 12000,
+        "maxValue": 20000,
+        "random": true
+      }
+    },
+    {
+      "name": "SPUD_DATE",
+      "type": "date",
+      "description": "Date drilling began",
+      "generation": {
+        "begin": "2020-01-01",
+        "end": "2025-02-14",
+        "random": true
+      }
+    },
+    {
+      "name": "COMPLETION_DATE",
+      "type": "date",
+      "description": "Date well was completed",
+      "generation": {
+        "begin": "2020-01-01",
+        "end": "2025-02-14",
+        "random": true
+      }
+    },
+    {
+      "name": "SURFACE_CASING_DEPTH",
+      "type": "integer",
+      "description": "Surface casing depth in feet",
+      "generation": {
+        "minValue": 500,
+        "maxValue": 800,
+        "random": true
+      }
+    },
+    {
+      "name": "OPERATOR_NAME",
+      "type": "string",
+      "description": "Well operator",
+      "generation": {
+        "values": ["OPERATOR_XYZ"]
+      }
+    },
+    {
+      "name": "PERMIT_DATE",
+      "type": "date",
+      "description": "Drilling permit date",
+      "generation": {
+        "begin": "2019-01-01",
+        "end": "2025-02-14",
+        "random": true
+      }
+    },
+    {
+      "name": "q_i",
+      "type": "double",
+      "description": "ARPS initial production rate (BOPD)",
+      "generation": {
+        "values": ["__Q_I__"],
+        "note": "Set from formation TYPE_CURVE_PARAMS"
+      }
+    },
+    {
+      "name": "d",
+      "type": "double",
+      "description": "ARPS initial decline rate",
+      "generation": {
+        "values": ["__D__"],
+        "note": "Set from formation TYPE_CURVE_PARAMS"
+      }
+    },
+    {
+      "name": "b",
+      "type": "double",
+      "description": "ARPS hyperbolic exponent (b-factor)",
+      "generation": {
+        "values": ["__B__"],
+        "note": "Set from formation TYPE_CURVE_PARAMS"
+      }
+    }
+  ]
+}

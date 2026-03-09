@@ -1,0 +1,200 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "S3BucketAccess",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject",
+        "s3:ListBucket",
+        "s3:GetBucketLocation",
+        "s3:GetLifecycleConfiguration",
+        "s3:PutLifecycleConfiguration",
+        "s3:AbortMultipartUpload",
+        "s3:ListMultipartUploadParts"
+      ],
+      "Resource": [
+        "arn:aws:s3:::${UC_BUCKET}",
+        "arn:aws:s3:::${UC_BUCKET}/*",
+        "arn:aws:s3:::${CATALOG_BUCKET}",
+        "arn:aws:s3:::${CATALOG_BUCKET}/*",
+        "arn:aws:s3:::${DBFS_BUCKET}",
+        "arn:aws:s3:::${DBFS_BUCKET}/*"
+      ]
+    },
+    {
+      "Sid": "GlueFullAccess",
+      "Effect": "Allow",
+      "Action": [
+        "glue:GetDatabase",
+        "glue:GetDatabases",
+        "glue:CreateDatabase",
+        "glue:UpdateDatabase",
+        "glue:DeleteDatabase",
+        "glue:GetTable",
+        "glue:GetTables",
+        "glue:CreateTable",
+        "glue:UpdateTable",
+        "glue:DeleteTable",
+        "glue:GetPartition",
+        "glue:GetPartitions",
+        "glue:CreatePartition",
+        "glue:BatchCreatePartition",
+        "glue:UpdatePartition",
+        "glue:DeletePartition",
+        "glue:BatchDeletePartition",
+        "glue:GetUserDefinedFunction",
+        "glue:GetUserDefinedFunctions",
+        "glue:CreateUserDefinedFunction",
+        "glue:UpdateUserDefinedFunction",
+        "glue:DeleteUserDefinedFunction",
+        "glue:GetCatalogImportStatus",
+        "glue:GetConnection",
+        "glue:GetConnections",
+        "glue:CreateConnection",
+        "glue:UpdateConnection",
+        "glue:DeleteConnection"
+      ],
+      "Resource": [
+        "arn:aws:glue:${AWS_REGION}:${AWS_ACCOUNT_ID}:catalog",
+        "arn:aws:glue:${AWS_REGION}:${AWS_ACCOUNT_ID}:database/*",
+        "arn:aws:glue:${AWS_REGION}:${AWS_ACCOUNT_ID}:table/*/*",
+        "arn:aws:glue:${AWS_REGION}:${AWS_ACCOUNT_ID}:userDefinedFunction/*/*",
+        "arn:aws:glue:${AWS_REGION}:${AWS_ACCOUNT_ID}:connection/*"
+      ]
+    },
+    {
+      "Sid": "KinesisFullAccess",
+      "Effect": "Allow",
+      "Action": [
+        "kinesis:DescribeStream",
+        "kinesis:DescribeStreamSummary",
+        "kinesis:GetShardIterator",
+        "kinesis:GetRecords",
+        "kinesis:ListShards",
+        "kinesis:PutRecord",
+        "kinesis:PutRecords",
+        "kinesis:SubscribeToShard",
+        "kinesis:ListStreams",
+        "kinesis:DescribeStreamConsumer",
+        "kinesis:RegisterStreamConsumer",
+        "kinesis:DeregisterStreamConsumer",
+        "kinesis:ListStreamConsumers"
+      ],
+      "Resource": [
+        "arn:aws:kinesis:${AWS_REGION}:${AWS_ACCOUNT_ID}:stream/${WORKSPACE_PREFIX}-*"
+      ]
+    },
+    {
+      "Sid": "KinesisListStreams",
+      "Effect": "Allow",
+      "Action": [
+        "kinesis:ListStreams"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "DynamoDBFullAccess",
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:GetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:PutItem",
+        "dynamodb:Query",
+        "dynamodb:Scan",
+        "dynamodb:UpdateItem",
+        "dynamodb:DescribeStream",
+        "dynamodb:ListStreams"
+      ],
+      "Resource": [
+        "arn:aws:dynamodb:${AWS_REGION}:${AWS_ACCOUNT_ID}:table/${WORKSPACE_PREFIX}-*",
+        "arn:aws:dynamodb:${AWS_REGION}:${AWS_ACCOUNT_ID}:table/${WORKSPACE_PREFIX}-*/stream/*",
+        "arn:aws:dynamodb:${AWS_REGION}:${AWS_ACCOUNT_ID}:table/${WORKSPACE_PREFIX}-*/index/*"
+      ]
+    },
+    {
+      "Sid": "DynamoDBListTables",
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:ListTables"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "MSKFullAccess",
+      "Effect": "Allow",
+      "Action": [
+        "kafka:DescribeCluster",
+        "kafka:DescribeClusterV2",
+        "kafka:GetBootstrapBrokers",
+        "kafka:ListClusters",
+        "kafka:ListClustersV2",
+        "kafka:DescribeConfiguration",
+        "kafka:ListConfigurations",
+        "kafka-cluster:Connect",
+        "kafka-cluster:AlterCluster",
+        "kafka-cluster:DescribeCluster",
+        "kafka-cluster:DescribeClusterDynamicConfiguration",
+        "kafka-cluster:AlterClusterDynamicConfiguration",
+        "kafka-cluster:WriteDataIdempotently",
+        "kafka-cluster:CreateTopic",
+        "kafka-cluster:DescribeTopic",
+        "kafka-cluster:AlterTopic",
+        "kafka-cluster:DeleteTopic",
+        "kafka-cluster:DescribeTopicDynamicConfiguration",
+        "kafka-cluster:AlterTopicDynamicConfiguration",
+        "kafka-cluster:ReadData",
+        "kafka-cluster:WriteData",
+        "kafka-cluster:DescribeGroup",
+        "kafka-cluster:AlterGroup",
+        "kafka-cluster:DeleteGroup"
+      ],
+      "Resource": [
+        "arn:aws:kafka:${AWS_REGION}:${AWS_ACCOUNT_ID}:cluster/${WORKSPACE_PREFIX}-*/*",
+        "arn:aws:kafka:${AWS_REGION}:${AWS_ACCOUNT_ID}:topic/${WORKSPACE_PREFIX}-*/*",
+        "arn:aws:kafka:${AWS_REGION}:${AWS_ACCOUNT_ID}:group/${WORKSPACE_PREFIX}-*/*"
+      ]
+    },
+    {
+      "Sid": "RDSConnectAccess",
+      "Effect": "Allow",
+      "Action": [
+        "rds:DescribeDBInstances",
+        "rds:DescribeDBClusters",
+        "rds-db:connect"
+      ],
+      "Resource": [
+        "arn:aws:rds:${AWS_REGION}:${AWS_ACCOUNT_ID}:db:${WORKSPACE_PREFIX}-*",
+        "arn:aws:rds:${AWS_REGION}:${AWS_ACCOUNT_ID}:cluster:${WORKSPACE_PREFIX}-*",
+        "arn:aws:rds-db:${AWS_REGION}:${AWS_ACCOUNT_ID}:dbuser:*/*"
+      ]
+    },
+    {
+      "Sid": "SecretsManagerAccess",
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:DescribeSecret"
+      ],
+      "Resource": [
+        "arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:${WORKSPACE_PREFIX}-*"
+      ]
+    },
+    {
+      "Sid": "SelfAssume",
+      "Effect": "Allow",
+      "Action": [
+        "sts:AssumeRole"
+      ],
+      "Resource": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/${ROLE_NAME}"
+    }
+  ]
+}

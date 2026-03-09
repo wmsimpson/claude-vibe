@@ -1,0 +1,132 @@
+direction: down
+
+title: SQRC Validator - 7 Validation Checks {
+  shape: text
+  style.font-size: 20
+}
+
+start: "Completed\nQuestionnaire" {
+  shape: oval
+  style.fill: "#e3f2fd"
+}
+
+# Check 1
+check1: "1. Azure Check" {
+  shape: rectangle
+  style.fill: "#ffcdd2"
+}
+check1_result: "BLOCKING" {
+  shape: text
+  style.font-size: 12
+}
+
+# Check 2
+check2: "2. GenAI Detection" {
+  shape: rectangle
+  style.fill: "#ffe0b2"
+}
+check2_result: "HIGH" {
+  shape: text
+  style.font-size: 12
+}
+
+# Check 3
+check3: "3. Source Verification" {
+  shape: rectangle
+  style.fill: "#ffe0b2"
+}
+check3_result: "HIGH" {
+  shape: text
+  style.font-size: 12
+}
+
+# Check 4
+check4: "4. Custom Answer Flag" {
+  shape: rectangle
+  style.fill: "#fff9c4"
+}
+check4_result: "MEDIUM" {
+  shape: text
+  style.font-size: 12
+}
+
+# Check 5
+check5: "5. Completeness (90-95%)" {
+  shape: rectangle
+  style.fill: "#fff9c4"
+}
+check5_result: "MEDIUM" {
+  shape: text
+  style.font-size: 12
+}
+
+# Check 6
+check6: "6. Control Ownership" {
+  shape: rectangle
+  style.fill: "#fff9c4"
+}
+check6_result: "MEDIUM" {
+  shape: text
+  style.font-size: 12
+}
+
+# Check 7
+check7: "7. NDA Content Check" {
+  shape: rectangle
+  style.fill: "#fff9c4"
+}
+check7_result: "MEDIUM" {
+  shape: text
+  style.font-size: 12
+}
+
+# Results
+decision: "All Checks Pass?" {
+  shape: diamond
+  style.fill: "#e1bee7"
+}
+
+ready: "READY TO SHARE" {
+  shape: hexagon
+  style.fill: "#4caf50"
+  style.font-color: white
+}
+
+needs_review: "NEEDS REVIEW" {
+  shape: hexagon
+  style.fill: "#ff9800"
+  style.font-color: white
+}
+
+escalate: "ESCALATE" {
+  shape: hexagon
+  style.fill: "#f44336"
+  style.font-color: white
+}
+
+# Flow
+start -> check1
+check1 -> check1_result
+check1 -> check2
+
+check2 -> check2_result
+check2 -> check3
+
+check3 -> check3_result
+check3 -> check4
+
+check4 -> check4_result
+check4 -> check5
+
+check5 -> check5_result
+check5 -> check6
+
+check6 -> check6_result
+check6 -> check7
+
+check7 -> check7_result
+check7 -> decision
+
+decision -> ready: "Yes"
+decision -> needs_review: "Issues flagged"
+decision -> escalate: "Azure detected"

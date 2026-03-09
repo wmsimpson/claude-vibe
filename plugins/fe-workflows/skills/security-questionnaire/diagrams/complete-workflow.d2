@@ -1,0 +1,99 @@
+direction: down
+
+title: Security Questionnaire Complete Workflow {
+  shape: text
+  style.font-size: 20
+}
+
+# Phase 1: Initial Checks
+receive: "1. Receive Questionnaire" {
+  shape: oval
+  style.fill: "#e3f2fd"
+}
+
+azure_check: "2. AZURE CHECK" {
+  shape: diamond
+  style.fill: "#ffcdd2"
+}
+
+azure_stop: "HARD STOP\nRoute to Azure Team" {
+  shape: hexagon
+  style.fill: "#ff4444"
+  style.font-color: white
+}
+
+# Phase 2: Avoidance Strategy
+avoid: "3. Try to AVOID\nthe Questionnaire" {
+  shape: diamond
+  style.fill: "#fff9c4"
+}
+
+prebuilt: "Provide Pre-built Content\n(Security Package, SIG)" {
+  shape: rectangle
+  style.fill: "#c8e6c9"
+}
+
+# Phase 3: Triage
+triage: "4. Follow Triage\nFlowchart" {
+  shape: rectangle
+  style.fill: "#e1bee7"
+}
+
+# Phase 4: Completion
+categorize: "5. Categorize Questions\n(9 categories)" {
+  shape: rectangle
+  style.fill: "#b3e5fc"
+}
+
+research: "6. Research using SQRC\n(Primary Source)" {
+  shape: rectangle
+  style.fill: "#b3e5fc"
+}
+
+draft: "7. Draft Responses\n(Score + Evidence)" {
+  shape: rectangle
+  style.fill: "#b3e5fc"
+}
+
+controls: "8. Verify Control\nOwnership" {
+  shape: rectangle
+  style.fill: "#b3e5fc"
+}
+
+# Phase 5: Validation
+validate: "9. Run VALIDATION\n(sqrc-validator)" {
+  shape: rectangle
+  style.fill: "#ffe0b2"
+}
+
+review: "10. Security Review\n(if needed)" {
+  shape: diamond
+  style.fill: "#fff9c4"
+}
+
+deliver: "11. Deliver to Customer" {
+  shape: oval
+  style.fill: "#c8e6c9"
+}
+
+# Connections
+receive -> azure_check
+
+azure_check -> azure_stop: "Azure detected"
+azure_check -> avoid: "Not Azure"
+
+avoid -> prebuilt: "Customer accepts"
+avoid -> triage: "Custom required"
+
+prebuilt -> deliver
+
+triage -> categorize
+categorize -> research
+research -> draft
+draft -> controls
+controls -> validate
+
+validate -> review: "Issues found"
+validate -> deliver: "All checks pass"
+
+review -> deliver: "Approved"

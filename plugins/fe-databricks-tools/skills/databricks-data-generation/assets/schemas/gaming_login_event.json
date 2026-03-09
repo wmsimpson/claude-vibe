@@ -1,0 +1,237 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "name": "gaming_login_event",
+  "version": "1.0.0",
+  "description": "Gaming platform login event telemetry with device fingerprinting, GeoIP enrichment, and session correlation. Uses baseColumnType='hash' for deterministic ID generation (Tier 3 / notebook-only).",
+  "industry": "gaming",
+  "medallion_layer": "silver",
+  "typical_rows": {"min": 500000, "default": 4500000, "max": 50000000},
+  "cardinality": {
+    "users": 200000,
+    "devices": 250000,
+    "ips": 40000
+  },
+  "relationships": [],
+  "tier": 3,
+  "tier_note": "Uses baseColumnType='hash' which requires notebook execution. Does NOT work over Databricks Connect.",
+  "columns": [
+    {
+      "name": "EVENT_TIMESTAMP",
+      "type": "timestamp",
+      "description": "Login event timestamp, random within configured date range",
+      "generation": {
+        "data_range": "DateRange(start, end, 'seconds=1')",
+        "random": true
+      }
+    },
+    {
+      "name": "internal_ACCOUNTID",
+      "type": "long",
+      "description": "Internal account identifier used for deterministic hashing (omitted from output)",
+      "omit": true,
+      "generation": {
+        "minValue": "0x1000000000000",
+        "uniqueValues": 200000,
+        "baseColumnType": "hash"
+      }
+    },
+    {
+      "name": "ACCOUNTID",
+      "type": "string",
+      "description": "Public account identifier as 32-character hex string",
+      "generation": {
+        "format": "0x%032x",
+        "baseColumn": "internal_ACCOUNTID"
+      }
+    },
+    {
+      "name": "internal_DEVICEID",
+      "type": "long",
+      "description": "Internal device identifier derived from account (omitted from output)",
+      "omit": true,
+      "generation": {
+        "minValue": "0x1000000000000",
+        "uniqueValues": 250000,
+        "baseColumnType": "hash",
+        "baseColumn": "internal_ACCOUNTID"
+      }
+    },
+    {
+      "name": "DEVICEID",
+      "type": "string",
+      "description": "Public device identifier as 32-character hex string",
+      "generation": {
+        "format": "0x%032x",
+        "baseColumn": "internal_DEVICEID"
+      }
+    },
+    {
+      "name": "APP_VERSION",
+      "type": "string",
+      "description": "Application version (static value)",
+      "generation": {
+        "values": ["current"]
+      }
+    },
+    {
+      "name": "AUTHMETHOD",
+      "type": "string",
+      "description": "Authentication method used for login",
+      "generation": {
+        "values": ["OAuth", "password"]
+      }
+    },
+    {
+      "name": "CLIENTNAME",
+      "type": "string",
+      "description": "Game client platform, deterministically assigned from DEVICEID hash",
+      "generation": {
+        "expr": "element_at(array('SwitchGameClient','XboxGameClient','PlaystationGameClient','PCGameClient'), (pmod(abs(hash(DEVICEID)), 4) + 1))"
+      }
+    },
+    {
+      "name": "CLIENTID",
+      "type": "string",
+      "description": "Deterministic client identifier (SHA-256 of ACCOUNTID + CLIENTNAME)",
+      "generation": {
+        "expr": "sha2(concat(ACCOUNTID, CLIENTNAME), 256)",
+        "baseColumn": ["ACCOUNTID", "CLIENTNAME"]
+      }
+    },
+    {
+      "name": "SESSION_ID",
+      "type": "string",
+      "description": "Session correlation identifier (SHA-256 of ACCOUNTID + CLIENTID)",
+      "generation": {
+        "expr": "sha2(concat(ACCOUNTID, CLIENTID), 256)"
+      }
+    },
+    {
+      "name": "country",
+      "type": "string",
+      "description": "Player country with weighted distribution",
+      "generation": {
+        "values": ["USA", "UK", "AUS"],
+        "weights": [0.6, 0.2, 0.2],
+        "baseColumn": "ACCOUNTID",
+        "random": true
+      }
+    },
+    {
+      "name": "APPENV",
+      "type": "string",
+      "description": "Application environment (static value)",
+      "generation": {
+        "values": ["prod"]
+      }
+    },
+    {
+      "name": "EVENT_TYPE",
+      "type": "string",
+      "description": "Event classification (static value)",
+      "generation": {
+        "values": ["account_login_success"]
+      }
+    },
+    {
+      "name": "CITY",
+      "type": "string",
+      "description": "GeoIP city derived from country via CASE expression",
+      "generation": {
+        "expr": "CASE WHEN country = 'USA' THEN element_at(array('New York', 'San Francisco', 'Chicago'), pmod(abs(hash(ACCOUNTID)), 3) + 1) WHEN country = 'UK' THEN 'London' WHEN country = 'AUS' THEN 'Sydney' END",
+        "baseColumn": ["country", "ACCOUNTID"]
+      }
+    },
+    {
+      "name": "COUNTRY_CODE2",
+      "type": "string",
+      "description": "ISO 2-letter country code",
+      "generation": {
+        "expr": "CASE WHEN country = 'USA' THEN 'US' WHEN country = 'UK' THEN 'UK' WHEN country = 'AUS' THEN 'AU' END",
+        "baseColumn": ["country"]
+      }
+    },
+    {
+      "name": "ISP",
+      "type": "string",
+      "description": "Internet service provider, country-specific selection via hash bucket",
+      "generation": {
+        "expr": "CASE WHEN country = 'USA' THEN element_at(array('Comcast','AT&T','Verizon','Spectrum','Cox'), pmod(abs(hash(ACCOUNTID)),5)+1) WHEN country = 'UK' THEN element_at(array('BT','Sky','Virgin Media','TalkTalk','EE'), pmod(abs(hash(ACCOUNTID)),5)+1) WHEN country = 'AUS' THEN element_at(array('Telstra','Optus','TPG','Aussie Broadband','iiNet'), pmod(abs(hash(ACCOUNTID)),5)+1) ELSE 'Unknown ISP' END",
+        "baseColumn": ["country", "ACCOUNTID"]
+      }
+    },
+    {
+      "name": "LATITUDE",
+      "type": "double",
+      "description": "City-level latitude coordinate",
+      "generation": {
+        "expr": "CASE WHEN CITY = 'New York' THEN 40.7128 WHEN CITY = 'San Francisco' THEN 37.7749 WHEN CITY = 'Chicago' THEN 41.8781 WHEN CITY = 'London' THEN 51.5074 WHEN CITY = 'Sydney' THEN -33.8688 ELSE 0.0 END",
+        "baseColumn": "CITY"
+      }
+    },
+    {
+      "name": "LONGITUDE",
+      "type": "double",
+      "description": "City-level longitude coordinate",
+      "generation": {
+        "expr": "CASE WHEN CITY = 'New York' THEN -74.0060 WHEN CITY = 'San Francisco' THEN -122.4194 WHEN CITY = 'Chicago' THEN -87.6298 WHEN CITY = 'London' THEN -0.1278 WHEN CITY = 'Sydney' THEN 151.2093 ELSE 0.0 END",
+        "baseColumn": "CITY"
+      }
+    },
+    {
+      "name": "REGION_NAME",
+      "type": "string",
+      "description": "State/province/region name derived from country and city",
+      "generation": {
+        "expr": "CASE WHEN country = 'USA' THEN CASE WHEN CITY = 'New York' THEN 'New York' WHEN CITY = 'San Francisco' THEN 'California' WHEN CITY = 'Chicago' THEN 'Illinois' ELSE 'Unknown' END WHEN country = 'UK' THEN 'England' WHEN country = 'AUS' THEN 'New South Wales' ELSE 'Unknown' END",
+        "baseColumn": ["country", "CITY"]
+      }
+    },
+    {
+      "name": "internal_REQUESTIPADDRESS",
+      "type": "long",
+      "description": "Internal IP address as integer, device-correlated (omitted from output)",
+      "omit": true,
+      "generation": {
+        "minValue": "0x1000000000000",
+        "uniqueValues": 40000,
+        "baseColumnType": "hash",
+        "baseColumn": "internal_DEVICEID"
+      }
+    },
+    {
+      "name": "REQUESTIPADDRESS",
+      "type": "string",
+      "description": "Dotted-quad IP address computed from internal integer via bit shifts",
+      "generation": {
+        "expr": "concat(cast((internal_REQUESTIPADDRESS >> 24) & 255 as string), '.', cast((internal_REQUESTIPADDRESS >> 16) & 255 as string), '.', cast((internal_REQUESTIPADDRESS >> 8) & 255 as string), '.', cast(internal_REQUESTIPADDRESS & 255 as string))",
+        "baseColumn": "internal_REQUESTIPADDRESS"
+      }
+    },
+    {
+      "name": "USERAGENT",
+      "type": "string",
+      "description": "Constructed user agent string from client name and session",
+      "generation": {
+        "expr": "concat('Launch/1.0+', CLIENTNAME, '(', CLIENTNAME, '/)/', SESSION_ID)",
+        "baseColumn": ["CLIENTNAME", "SESSION_ID"]
+      }
+    },
+    {
+      "name": "EVENT_HOUR",
+      "type": "integer",
+      "description": "Hour of the event (0-23), derived via post-processing",
+      "generation": {
+        "post_processing": "hour(col('EVENT_TIMESTAMP'))"
+      }
+    },
+    {
+      "name": "EVENT_DATE",
+      "type": "date",
+      "description": "Date of the event, derived via post-processing",
+      "generation": {
+        "post_processing": "to_date(col('EVENT_TIMESTAMP'))"
+      }
+    }
+  ]
+}

@@ -1,0 +1,169 @@
+# Claude Code Permissions Configuration
+# These permissions will be merged into ~/.claude/settings.json
+
+allow:
+  # Base permissions
+  - "Skill"
+
+  # File access - code directory
+  - "Read(~/code/**)"
+  - "Edit(~/code/**)"
+  - "Write(~/code/**)"
+
+  # File access - tmp directory
+  - "Read(//tmp/**)"
+  - "Edit(//tmp/**)"
+  - "Write(//tmp/**)"
+
+  # File access - vibe directory
+  - "Read(~/.vibe/**)"
+  - "Edit(~/.vibe/**)"
+  - "Write(~/.vibe/**)"
+
+  # File access - claude directory
+  - "Read(~/.claude/**)"
+
+  # File access - home directory (read only)
+  - "Read(~/**)"
+
+  # MCP tool permissions (active)
+  # Add MCP permissions here as you enable servers in mcp-servers.yaml
+
+  # DISABLED MCP permissions (Databricks-internal servers, see mcp-servers.yaml)
+  # - "mcp__proxy__slack__slack_write_api_call"
+  # - "mcp__proxy__glean__glean_read_api_call"
+  # - "mcp__proxy__glean__glean_write_api_call"
+
+  # Bash - allows all bash commands
+  # Note: "Bash" without parentheses allows all commands
+  # Use patterns like "Bash(npm:*)" for prefix matching specific commands
+
+  # ---------------------------------------------------------------
+  # ACTIVE SKILLS
+  # ---------------------------------------------------------------
+
+  # App development (mobile + web)
+  - "Skill(app-setup)"
+  - "Skill(github-workflow)"
+  - "Skill(web-deployment)"
+  - "Skill(app-debug)"
+
+  # Setup & maintenance
+  - "Skill(configure-vibe)"
+  - "Skill(setup-integrations)"
+  - "Skill(validate-mcp-access)"
+  - "Skill(vibe-update)"
+  - "Skill(vibe-usage)"
+  - "Skill(vibe-report-issue)"
+
+  # Databricks tools (kept for SA/customer work)
+  - "Skill(databricks-authentication)"
+  - "Skill(databricks-apps)"
+  - "Skill(databricks-data-generation)"
+  - "Skill(databricks-demo)"
+  - "Skill(databricks-lakebase)"
+  - "Skill(databricks-lakeview-dashboard)"
+  - "Skill(databricks-lakeview-dashboard-analyzer)"
+  - "Skill(databricks-lineage)"
+  - "Skill(databricks-query)"
+  - "Skill(databricks-resource-deployment)"
+  - "Skill(databricks-warehouse-selector)"
+  - "Skill(databricks-workspace-files)"
+  - "Skill(fe-snowflake)"
+
+  # Google Workspace
+  - "Skill(gmail)"
+  - "Skill(google-auth)"
+  - "Skill(google-calendar)"
+  - "Skill(google-docs)"
+  - "Skill(google-forms)"
+  - "Skill(google-sheets)"
+  - "Skill(google-slides)"
+  - "Skill(google-tasks)"
+
+  # JIRA (generalized)
+  - "Skill(jira-actions)"
+
+  # Workflows
+  - "Skill(competitive-analysis)"
+  - "Skill(databricks-learning-assistant)"
+  - "Skill(databricks-sizing)"
+  - "Skill(databricks-troubleshooting)"
+  - "Skill(draft-rca)"
+  - "Skill(fe-account-tap-map)"
+  - "Skill(fe-account-transition)"
+  - "Skill(fe-answer-customer-questions)"
+  - "Skill(fe-architecture-diagram)"
+  - "Skill(fe-customer-courses)"
+  - "Skill(fe-databricks-feature-tester)"
+  - "Skill(fe-poc-doc)"
+  - "Skill(fe-poc-postmortem)"
+  - "Skill(interview-prep)"
+  - "Skill(lucid-diagram)"
+  - "Skill(performance-tuning)"
+  - "Skill(product-question-research)"
+  - "Skill(security-questionnaire)"
+  - "Skill(showcase)"
+  - "Skill(support-escalation)"
+
+  # macOS & productivity
+  - "Skill(macos-scheduler)"
+
+  # Lean Sigma
+  - "Skill(lean-sigma-fmea)"
+  - "Skill(lean-sigma-process-map)"
+  - "Skill(lean-sigma-sipoc)"
+
+  # ---------------------------------------------------------------
+  # DISABLED SKILLS (Databricks-internal dependencies)
+  # Moved to plugins/_disabled/ — kept for future reference
+  # ---------------------------------------------------------------
+
+  # Salesforce (databricks.my.salesforce.com)
+  # - "Skill(salesforce-actions)"
+  # - "Skill(salesforce-authentication)"
+  # - "Skill(uco-updates)"
+
+  # Databricks internal analytics (logfood workspace)
+  # - "Skill(aws-authentication)"           # Databricks Okta/AWS SSO
+  # - "Skill(databricks-org)"               # Databricks employee directory
+  # - "Skill(genie-rooms)"                  # Databricks Genie rooms
+  # - "Skill(internal-jargon)"              # Databricks internal glossary
+  # - "Skill(uco-consumption-analysis)"     # logfood consumption data
+  # - "Skill(centralized-system-tables-translator)"  # Databricks internal multi-account tables
+
+  # Expenses (Emburse ChromeRiver)
+  # - "Skill(emburse-expenses)"
+  # - "Skill(file-expenses)"
+
+  # SSA workflows (Databricks SA-specific)
+  # - "Skill(ssagent-sfdc)"
+  # - "Skill(ssagent-new-asq)"
+  # - "Skill(ssagent-researcher)"
+  # - "Skill(ssagent-notes)"
+  # - "Skill(ssagent-close)"
+  # - "Skill(ssagent-weekly)"
+
+  # FinancialForce / Certinia
+  # - "Skill(financialforce-project-status)"
+
+  # EE / Manager / DNB workflows
+  # - "Skill(ae-uco-hygiene)"
+  # - "Skill(ae-accounts-signals)"
+  # - "Skill(ae-biweekly-review)"
+  # - "Skill(ae-territory-big-bet-research)"
+  # - "Skill(dnb-hunter-poc-doc)"
+  # - "Skill(account-review-deck)"
+  # - "Skill(fe-rfp)"
+
+  # Internal MCP tools (logfood Genie/case)
+  # - "Skill(genie-case)"
+  # - "Skill(genie-request)"
+  # - "Skill(logcall)"
+  # - "Skill(logcall-config)"
+
+  # Databricks internal workspace deployment
+  # - "Skill(databricks-fe-vm-workspace-deployment)"
+  # - "Skill(databricks-oneenv-workspace-deployment)"
+
+deny: []

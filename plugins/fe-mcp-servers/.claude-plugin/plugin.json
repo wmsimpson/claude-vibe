@@ -1,0 +1,8 @@
+{
+  "name": "fe-mcp-servers",
+  "description": "Custom Field Engineering MCP servers (future-ready)",
+  "version": "1.0.0",
+  "author": {
+    "name": "Databricks Field Engineering"
+  }
+}

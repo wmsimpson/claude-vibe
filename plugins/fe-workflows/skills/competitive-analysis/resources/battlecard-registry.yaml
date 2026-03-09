@@ -1,0 +1,301 @@
+# Competitive Battlecard Registry
+#
+# This file maps competitors to their battlecard resources in Google Drive.
+# Used by the competitive-analysis skill to automatically discover and retrieve
+# relevant battlecards for compete questions.
+#
+# Format:
+#   competitor_name:
+#     name: Full competitor name
+#     compete_type: platform|governance|oltp|ml|streaming|storage
+#     description: Brief description of competitor
+#     docs_url: Competitor documentation URL
+#     battlecards:
+#       - url: Google Drive URL (Docs or Slides)
+#         title: Descriptive title
+#         type: doc|slides
+#         updated: YYYY-MM-DD
+#         tags: [list, of, topics]
+#     focus_areas: [list of common compete areas]
+#     key_differentiators: [list of high-level differentiators]
+#
+# Compete Types:
+#   - platform: Full data platform competitors (Snowflake, Redshift, Fabric, BigQuery)
+#   - governance: Data governance and catalog solutions (Unity Catalog vs Polaris, Purview, Glue Catalog)
+#   - oltp: OLTP database competitors (Lakebase, Supabase, Firebase, PlanetScale)
+#   - ml: ML platform competitors (SageMaker, Vertex AI, Azure ML)
+#   - streaming: Streaming platforms (Kafka, Kinesis, Pub/Sub)
+#   - storage: Storage solutions (S3, ADLS, GCS)
+
+competitors:
+  snowflake:
+    name: Snowflake
+    compete_type: platform
+    description: "Cloud data platform competitor - data warehousing, data sharing, Snowpark"
+    docs_url: "https://docs.snowflake.com/"
+    battlecards:
+      - url: "https://docs.google.com/presentation/d/1fjrioZbSvkRnffwXhli2jlW5yBeLF-z-KFKRj2OrdHs/edit"
+        title: "Databricks vs Snowflake - Comprehensive Battlecard"
+        type: slides
+        tags:
+          - streaming
+          - governance
+          - ML
+          - data_warehousing
+          - snowpark
+          - lakeflow
+          - unity_catalog
+          - general
+
+    # Common compete areas
+    focus_areas:
+      - "Data Warehousing vs Lakehouse"
+      - "Snowpipe Streaming vs Lakeflow"
+      - "Snowpark vs Databricks ML"
+      - "Data Sharing vs Delta Sharing"
+      - "Unity Catalog vs Snowflake Governance"
+
+    # Key differentiators (high-level, will be enriched from battlecards)
+    key_differentiators:
+      - "Unified data + AI platform (not just warehousing)"
+      - "True streaming with Structured Streaming"
+      - "Open formats (Delta Lake) vs proprietary"
+      - "Native Spark for distributed compute"
+      - "MLflow for end-to-end ML lifecycle"
+
+  redshift:
+    name: Amazon Redshift
+    compete_type: platform
+    description: "AWS data warehousing service - SQL analytics, data warehousing, AWS ecosystem integration"
+    docs_url: "https://docs.aws.amazon.com/redshift/"
+    battlecards:
+      - url: "https://docs.google.com/presentation/d/1lY1ISrZu8haf4_IKYEjfYiiLf8qvXPklta48snUjeWg/edit"
+        title: "Databricks vs Amazon Redshift - Comprehensive Battlecard"
+        type: slides
+        tags:
+          - data_warehousing
+          - sql
+          - aws
+          - cost
+          - performance
+          - ML
+          - streaming
+          - general
+
+    # Common compete areas
+    focus_areas:
+      - "Data Warehousing vs Lakehouse Architecture"
+      - "SQL Performance and Query Optimization"
+      - "Data Warehousing vs Unified Data Platform"
+      - "Cost Optimization and TCO"
+      - "AWS Ecosystem Integration"
+      - "ML/AI Capabilities"
+      - "Streaming and Real-time Analytics"
+      - "Open Formats (Delta Lake) vs Proprietary"
+
+    # Key differentiators (high-level, will be enriched from battlecards)
+    key_differentiators:
+      - "Unified data + AI platform (not just warehousing)"
+      - "Open formats (Delta Lake) vs proprietary Redshift format"
+      - "Native Spark for distributed compute vs Redshift's MPP architecture"
+      - "Advanced ML/AI capabilities (MLflow, AutoML) vs Redshift ML limitations"
+      - "True streaming with Structured Streaming vs Redshift's batch-only approach"
+      - "Multi-cloud support vs AWS-only"
+      - "Better cost efficiency for large-scale data engineering workloads"
+
+  fabric:
+    name: Microsoft Fabric
+    compete_type: platform
+    description: "Microsoft unified analytics platform - Power BI integration, OneLake, data lakehouse, Microsoft ecosystem"
+    docs_url: "https://learn.microsoft.com/en-us/fabric/"
+    battlecards:
+      - url: "https://docs.google.com/presentation/d/18QcSkZXOERtCIaFHzcaodJ7AXfT5mZXUMKvkVtPIkmk/edit"
+        title: "Databricks vs Microsoft Fabric - Comprehensive Battlecard"
+        type: slides
+        tags:
+          - unified_analytics
+          - power_bi
+          - onelake
+          - microsoft
+          - lakehouse
+          - ML
+          - streaming
+          - general
+
+    # Common compete areas
+    focus_areas:
+      - "Unified Analytics Platform Architecture"
+      - "Data Lakehouse Implementation (OneLake vs Delta Lake)"
+      - "Power BI Integration vs Databricks SQL + BI Tools"
+      - "Microsoft Ecosystem Integration"
+      - "ML/AI Capabilities and MLOps"
+      - "Streaming and Real-time Processing"
+      - "Open Formats and Interoperability"
+      - "Enterprise Governance and Security"
+
+    # Key differentiators (high-level, will be enriched from battlecards)
+    key_differentiators:
+      - "Mature, production-proven lakehouse (Delta Lake) vs Fabric's newer OneLake"
+      - "Superior ML/AI platform (MLflow, AutoML, Feature Store) vs Fabric's limited ML"
+      - "True streaming with Structured Streaming vs Fabric's batch-oriented approach"
+      - "Multi-cloud support vs Microsoft-only"
+      - "Larger ecosystem and partner integrations"
+      - "Better performance for large-scale data engineering"
+      - "More flexible compute options (serverless, classic, SQL warehouses)"
+      - "Proven at scale with thousands of enterprise customers"
+
+  # Governance Competitors
+  polaris:
+    name: Polaris
+    compete_type: governance
+    description: "Snowflake's data catalog and governance solution - Unity Catalog competitor"
+    docs_url: "https://docs.snowflake.com/en/user-guide/data-governance-overview"
+    battlecards:
+      - url: "https://docs.google.com/presentation/d/1u97b0sFC5N1FRaEBbhMp5RPDAX5-Nt1HcyPLr5VK_ZE/edit?slide=id.g2f23d35adb0_0_128#slide=id.g2f23d35adb0_0_128"
+        title: "Unity Catalog vs Polaris - Governance Battlecard"
+        type: slides
+        tags:
+          - governance
+          - catalog
+          - unity_catalog
+          - data_lineage
+          - polaris
+
+    focus_areas:
+      - "Data Catalog and Discovery"
+      - "Data Lineage and Impact Analysis"
+      - "Access Control and Security Policies"
+      - "Data Quality and Profiling"
+      - "Cross-Cloud Governance"
+      - "Integration with Compute Platforms"
+
+    key_differentiators:
+      - "Open, vendor-neutral catalog (Unity Catalog) vs Snowflake-locked Polaris"
+      - "Works with any compute engine (Spark, Presto, etc.) vs Snowflake-only"
+      - "Multi-cloud support vs Snowflake ecosystem only"
+      - "Unified governance across data and AI assets"
+      - "Native integration with Delta Lake and open formats"
+
+  purview:
+    name: Microsoft Purview
+    compete_type: governance
+    description: "Microsoft's unified data governance solution - Unity Catalog competitor"
+    docs_url: "https://learn.microsoft.com/en-us/azure/purview/"
+    battlecards:
+      - url: "https://docs.google.com/presentation/d/1v3udCBlcjlTKeZSHBleUC5YsVFSBlz7Qq_X3P2sltHU/edit"
+        title: "Unity Catalog vs Microsoft Purview - Governance Battlecard"
+        type: slides
+        tags:
+          - governance
+          - catalog
+          - unity_catalog
+          - microsoft
+          - azure
+          - purview
+
+    focus_areas:
+      - "Data Catalog and Discovery"
+      - "Data Lineage and Impact Analysis"
+      - "Access Control and Security"
+      - "Data Classification and Sensitivity Labels"
+      - "Microsoft Ecosystem Integration"
+      - "Multi-Cloud Governance"
+
+    key_differentiators:
+      - "Integrated with compute platform (Unity Catalog) vs separate service (Purview)"
+      - "Open formats and multi-engine support vs Microsoft-centric"
+      - "Real-time governance vs batch scanning approach"
+      - "Unified catalog for data and ML assets"
+      - "Better performance for large-scale catalogs"
+
+  glue_catalog:
+    name: AWS Glue Data Catalog
+    compete_type: governance
+    description: "AWS's data catalog service - Unity Catalog competitor"
+    docs_url: "https://docs.aws.amazon.com/glue/latest/dg/catalog-and-crawler.html"
+    battlecards:
+      - url: "https://docs.google.com/presentation/d/12OFyAEpfELUKfd4Z86P_9F3G1KfG64MFQjL_C2PIv8E/edit?slide=id.g231331eb284_0_0#slide=id.g231331eb284_0_0"
+        title: "Unity Catalog vs AWS Glue Catalog - Governance Battlecard"
+        type: slides
+        tags:
+          - governance
+          - catalog
+          - unity_catalog
+          - aws
+          - glue
+
+    focus_areas:
+      - "Data Catalog and Discovery"
+      - "Schema Management and Evolution"
+      - "Access Control and IAM Integration"
+      - "Crawler-based Discovery"
+      - "AWS Ecosystem Integration"
+      - "Multi-Engine Query Support"
+
+    key_differentiators:
+      - "Integrated governance with compute (Unity Catalog) vs separate catalog service"
+      - "Fine-grained access control vs IAM-only approach"
+      - "Open formats and Delta Lake integration vs Hive Metastore format"
+      - "Real-time catalog updates vs crawler-based discovery"
+      - "Cross-cloud support vs AWS-only"
+
+  # OLTP Competitors
+  lakebase:
+    name: Lakebase
+    compete_type: oltp
+    description: "OLTP database built on data lake storage - Databricks competitor for transactional workloads"
+    docs_url: "https://lakebase.io/docs"
+    battlecards:
+      - url: "https://docs.google.com/presentation/d/1R784FiroNX0it0IU3ITtSt7IBX4MVXr3o7JkXdyDeE4/edit?slide=id.g377c99ddea5_0_272#slide=id.g377c99ddea5_0_272"
+        title: "Databricks Lakebase - OLTP Battlecard"
+        type: slides
+        tags:
+          - oltp
+          - transactional
+          - database
+          - lakehouse
+          - lakebase
+
+    focus_areas:
+      - "OLTP vs OLAP Use Cases"
+      - "Transactional Workload Performance"
+      - "ACID Compliance and Consistency"
+      - "Concurrency and Locking"
+      - "Integration with Analytics Workloads"
+      - "Storage and Compute Architecture"
+
+    key_differentiators:
+      - "Unified platform for analytics and ML vs OLTP-only focus"
+      - "Proven at scale for analytics workloads vs newer OLTP solution"
+      - "Rich ecosystem and integrations vs limited ecosystem"
+      - "Advanced ML/AI capabilities vs basic transactional features"
+      - "Multi-cloud support vs single-cloud focus"
+
+  supabase:
+    name: Supabase
+    compete_type: oltp
+    description: "Open-source Firebase alternative - PostgreSQL-based backend as a service"
+    docs_url: "https://supabase.com/docs"
+    # TODO: Add battlecard URLs when available
+    # battlecards:
+    #   - url: "https://docs.google.com/presentation/d/..."
+    #     title: "Databricks vs Supabase - Use Case Comparison"
+    #     type: slides
+    #     updated: "YYYY-MM-DD"
+    #     tags: [oltp, postgresql, backend, firebase]
+    battlecards: []
+
+    focus_areas:
+      - "OLTP vs Analytics Use Cases"
+      - "Real-time Features and Subscriptions"
+      - "Authentication and Authorization"
+      - "API Generation and Backend Services"
+      - "Data Warehousing vs Transactional Database"
+      - "Integration with Analytics Platforms"
+
+    key_differentiators:
+      - "Analytics and ML platform vs OLTP-focused backend"
+      - "Large-scale data processing vs transactional workloads"
+      - "Data lakehouse architecture vs traditional database"
+      - "Advanced analytics and BI vs basic CRUD operations"
+      - "Enterprise data governance vs application-focused"

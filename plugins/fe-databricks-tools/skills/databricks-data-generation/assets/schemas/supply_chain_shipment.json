@@ -1,0 +1,169 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "name": "supply_chain_shipment",
+  "version": "2.0.0",
+  "description": "Transportation and logistics shipment data with delivery tracking and carrier metrics",
+  "industry": "supply_chain",
+  "medallion_layer": "silver",
+  "typical_rows": {"min": 5000, "default": 30000, "max": 300000},
+  "relationships": [
+    {"child_of": "supply_chain_distribution_center", "fk_column": "origin_distribution_center_id", "fk_range": [1, 25]},
+    {"child_of": "supply_chain_product", "fk_column": "product_id", "fk_range": [1, 500]}
+  ],
+  "columns": [
+    {
+      "name": "id",
+      "type": "long",
+      "description": "Unique shipment record identifier",
+      "generation": {
+        "minValue": 1,
+        "unique": true
+      }
+    },
+    {
+      "name": "shipment_id",
+      "type": "string",
+      "description": "Shipment tracking code (SHP-0000000001)",
+      "generation": {
+        "expr": "concat('SHP-', lpad(cast(id as string), 10, '0'))"
+      }
+    },
+    {
+      "name": "origin_distribution_center_id",
+      "type": "integer",
+      "description": "Foreign key to distribution_centers (origin)",
+      "generation": {
+        "minValue": 1,
+        "maxValue": 25,
+        "random": true
+      }
+    },
+    {
+      "name": "destination_type",
+      "type": "string",
+      "description": "Destination type (distribution_center or Store)",
+      "generation": {
+        "note": "Weighted via seed column: 30% distribution_center, 70% Store",
+        "expr": "CASE WHEN destination_type_seed < 0.3 THEN 'distribution_center' ELSE 'Store' END"
+      }
+    },
+    {
+      "name": "destination_id",
+      "type": "integer",
+      "description": "Foreign key to distribution_centers or stores based on destination_type",
+      "generation": {
+        "expr": "CASE WHEN destination_type = 'distribution_center' THEN (id % 25) + 1 ELSE (id % 1000) + 1 END"
+      }
+    },
+    {
+      "name": "product_id",
+      "type": "integer",
+      "description": "Foreign key to products table",
+      "generation": {
+        "minValue": 1,
+        "maxValue": 500,
+        "random": true
+      }
+    },
+    {
+      "name": "ship_date",
+      "type": "timestamp",
+      "description": "Shipment departure timestamp",
+      "generation": {
+        "begin": "2024-01-01 00:00:00",
+        "end": "2025-09-29 23:59:59",
+        "random": true
+      }
+    },
+    {
+      "name": "expected_delivery",
+      "type": "timestamp",
+      "description": "Expected delivery timestamp",
+      "generation": {
+        "expr": "date_add(ship_date, transit_days)",
+        "note": "transit_days is an omitted seed column (1 to 6)"
+      }
+    },
+    {
+      "name": "actual_delivery",
+      "type": "timestamp",
+      "description": "Actual delivery timestamp (null for undelivered ~20%)",
+      "generation": {
+        "expr": "CASE WHEN delivery_probability > 0.2 THEN date_add(ship_date, actual_transit_days) ELSE NULL END"
+      }
+    },
+    {
+      "name": "on_time",
+      "type": "boolean",
+      "description": "Whether shipment arrived on or before expected delivery",
+      "generation": {
+        "expr": "actual_delivery IS NOT NULL AND actual_delivery <= expected_delivery"
+      }
+    },
+    {
+      "name": "delay_hours",
+      "type": "integer",
+      "description": "Hours of delay (negative for early delivery, null if undelivered)",
+      "generation": {
+        "expr": "CASE WHEN actual_delivery IS NOT NULL THEN cast((unix_timestamp(actual_delivery) - unix_timestamp(expected_delivery)) / 3600 as int) ELSE NULL END"
+      }
+    },
+    {
+      "name": "quantity",
+      "type": "integer",
+      "description": "Number of units shipped",
+      "generation": {
+        "minValue": 100,
+        "maxValue": 5000,
+        "random": true
+      }
+    },
+    {
+      "name": "transport_mode",
+      "type": "string",
+      "description": "Transportation method",
+      "generation": {
+        "note": "Weighted: 60% Truck, 15% Rail, 20% Intermodal, 5% Air",
+        "expr": "CASE WHEN transport_mode_seed < 0.60 THEN 'Truck' WHEN transport_mode_seed < 0.75 THEN 'Rail' WHEN transport_mode_seed < 0.95 THEN 'Intermodal' ELSE 'Air' END"
+      }
+    },
+    {
+      "name": "carrier",
+      "type": "string",
+      "description": "Shipping carrier name",
+      "generation": {
+        "values": ["FastFreight", "ReliableLogistics", "ExpressTransport", "GlobalShippers"],
+        "random": true
+      }
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "description": "Shipment status",
+      "generation": {
+        "note": "Weighted: 25% In Transit, 50% Delivered, 5% Delayed, 10% At Hub, 10% Out for Delivery",
+        "expr": "CASE WHEN status_seed < 0.25 THEN 'In Transit' WHEN status_seed < 0.75 THEN 'Delivered' WHEN status_seed < 0.80 THEN 'Delayed' WHEN status_seed < 0.90 THEN 'At Hub' ELSE 'Out for Delivery' END"
+      }
+    },
+    {
+      "name": "shipping_cost",
+      "type": "decimal(10,2)",
+      "description": "Cost of shipment",
+      "generation": {
+        "minValue": 50,
+        "maxValue": 5000,
+        "random": true
+      }
+    },
+    {
+      "name": "distance_miles",
+      "type": "integer",
+      "description": "Shipping distance in miles",
+      "generation": {
+        "minValue": 50,
+        "maxValue": 2500,
+        "random": true
+      }
+    }
+  ]
+}

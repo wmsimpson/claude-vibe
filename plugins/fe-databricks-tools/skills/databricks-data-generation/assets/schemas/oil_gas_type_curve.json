@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "name": "oil_gas_type_curve",
+  "version": "1.0.0",
+  "description": "Type curve forecast data per formation using ARPS decline curve for production benchmarking",
+  "industry": "oil_gas",
+  "medallion_layer": "silver",
+  "typical_rows": {"min": 500, "default": 2000, "max": 5000, "note": "per formation; forecast days"},
+  "generation_pattern": "per_formation_union",
+  "relationships": [
+    {"child_of": "oil_gas_well_header", "fk_column": "formation", "references": "PRODUCING_FORMATION"}
+  ],
+  "arps_formula": {
+    "expression": "q_i / power(1 + b * d * day_from_first_production, 1/b)",
+    "description": "ARPS hyperbolic decline forecast without shut-in or variation modifiers"
+  },
+  "formation_parameters": {
+    "FORMATION_A": {"q_i": 6000, "d": 0.01, "b": 0.8},
+    "FORMATION_B": {"q_i": 7000, "d": 0.011, "b": 0.7},
+    "FORMATION_C": {"q_i": 5500, "d": 0.009, "b": 0.8},
+    "FORMATION_D": {"q_i": 5750, "d": 0.011, "b": 0.7}
+  },
+  "columns": [
+    {
+      "name": "formation",
+      "type": "string",
+      "description": "Formation name",
+      "generation": {
+        "values": ["__FORMATION_NAME__"],
+        "note": "Set per formation in generation loop"
+      }
+    },
+    {
+      "name": "day_from_first_production",
+      "type": "integer",
+      "description": "Forecast day from first production",
+      "generation": {
+        "minValue": 1,
+        "maxValue": 1000
+      }
+    },
+    {
+      "name": "q_i",
+      "type": "double",
+      "description": "ARPS initial production rate (BOPD)",
+      "generation": {
+        "values": ["__Q_I__"],
+        "note": "Set from formation TYPE_CURVE_PARAMS"
+      }
+    },
+    {
+      "name": "d",
+      "type": "double",
+      "description": "ARPS initial decline rate",
+      "generation": {
+        "values": ["__D__"],
+        "note": "Set from formation TYPE_CURVE_PARAMS"
+      }
+    },
+    {
+      "name": "b",
+      "type": "double",
+      "description": "ARPS b-factor",
+      "generation": {
+        "values": ["__B__"],
+        "note": "Set from formation TYPE_CURVE_PARAMS"
+      }
+    },
+    {
+      "name": "variation",
+      "type": "double",
+      "description": "Random forecast variation factor",
+      "generation": {
+        "expr": "rand() * 0.1 + 0.95",
+        "note": "Range 0.95 to 1.05"
+      }
+    },
+    {
+      "name": "forecast_bopd",
+      "type": "double",
+      "description": "Forecasted oil production in barrels per day",
+      "generation": {
+        "baseColumn": ["q_i", "d", "b", "day_from_first_production"],
+        "expr": "q_i / power(1 + b * d * day_from_first_production, 1/b)"
+      }
+    }
+  ]
+}

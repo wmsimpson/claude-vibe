@@ -6,8 +6,9 @@ One command gets you:
 - **Claude Code** with AVX-aware install (npm or Homebrew)
 - **Google Workspace** access (Gmail, Docs, Sheets, Slides, Calendar, Forms, Tasks)
 - **Databricks AI Dev Kit** (50+ MCP tools, 34 skills)
-- **Claude Code Plugins** (Google tools, app dev, workflows, Lean Six Sigma, and more)
+- **11 plugin collections** — Google tools, app dev, workflows, JIRA, Lean Six Sigma, and more (bundled in this repo)
 - **MCP Integrations** (GitHub, Chrome DevTools, Slack, Brave Search)
+- **Profile management** — switch between identities (personal/work) instantly
 - **Full validation** to confirm everything works
 
 ## Quick Start
@@ -51,9 +52,29 @@ vibe profile delete work      # Delete a profile
 | 3 | Enable Google APIs and set quota project | 1 min |
 | 4 | Install dev tools (go, jq, yq, rg, node, gh, mmdc, graphviz) | 2 min |
 | 5 | Install Databricks AI Dev Kit (50+ MCP tools, 34 skills) | 3 min |
-| 6 | Install Claude Code plugins (Google, app dev, workflows) | 1 min |
+| 6 | Install Claude Code plugins from bundled collection | 1 min |
 | 7 | Configure MCP integrations (GitHub, Chrome DevTools, optional others) | 2 min |
 | 8 | Run full validation suite | 30 sec |
+
+## Bundled Plugins
+
+All plugins ship with this repo — no external repos or git clones required.
+
+| Plugin | Description |
+|--------|-------------|
+| `fe-google-tools` | Gmail, Docs, Sheets, Slides, Calendar, Forms, Tasks |
+| `fe-app-dev` | React Native, Expo, Next.js, Swift, Flutter — scaffold, deploy, debug |
+| `fe-workflows` | Architecture diagrams, RCA, POC docs, security questionnaires, sizing |
+| `fe-vibe-setup` | Environment setup, validation, usage stats, integrations |
+| `fe-specialized-agents` | Lucid Chart diagrams, Graphviz, web dev testing |
+| `fe-databricks-tools` | Databricks queries, deployments, workspace management, demos |
+| `fe-jira-tools` | Search, create, view, comment on JIRA tickets |
+| `fe-macos-scheduler` | Schedule recurring launchd tasks on macOS |
+| `lean-sigma-tools` | FMEA risk tables, SIPOC diagrams, swimlane process maps |
+| `fe-mcp-servers` | MCP server framework (future-ready) |
+| `fe-shared-resources` | Shared Python utilities and configs across plugins |
+
+During setup, you can install all plugins or select specific ones interactively.
 
 ## Prerequisites
 
@@ -105,10 +126,11 @@ vibe agent    # Launch Claude with personal profile loaded
 
 ```
 claude-vibe/
-  setup.sh              Bootstrap — installs vibe command and runs installer
-  bin/vibe              CLI entry point (symlinked to ~/.local/bin/vibe)
-  lib/tty.sh            TTY UI helpers (colors, prompts, spinners)
-  lib/profiles.sh       Profile management (save, switch, create, delete)
+  setup.sh                Bootstrap — installs vibe command and runs installer
+  bin/vibe                CLI entry point (symlinked to ~/.local/bin/vibe)
+  lib/
+    tty.sh                TTY UI helpers (colors, prompts, spinners)
+    profiles.sh           Profile management (save, switch, create, delete)
   steps/
     01-install-claude.sh
     02-google-oauth.sh
@@ -118,9 +140,23 @@ claude-vibe/
     06-install-plugins.sh
     07-configure-mcp.sh
     08-validate.sh
+  plugins/                Bundled plugin collections
+    fe-google-tools/      Google Workspace skills + agents
+    fe-app-dev/           App development skills
+    fe-workflows/         Workflow automation skills + agents
+    fe-vibe-setup/        Setup and diagnostics skills + agents
+    fe-specialized-agents/  Diagram and testing agents
+    fe-databricks-tools/  Databricks integration skills + agents
+    fe-jira-tools/        JIRA skills + agents
+    fe-macos-scheduler/   macOS scheduler skills
+    lean-sigma-tools/     Lean Six Sigma skills
+    fe-mcp-servers/       MCP server framework
+    fe-shared-resources/  Shared utilities
+  .claude-plugin/         Plugin manifests (plugin.json, marketplace.json)
+  permissions.yaml        Master skill permissions config
+  mcp-servers.yaml        MCP server configs
   config/
-    env.template         Template for ~/.vibe/env
-  README.md
+    env.template          Template for ~/.vibe/env
 ```
 
 ## What Gets Installed Where
@@ -129,11 +165,11 @@ claude-vibe/
 |------|-------|
 | vibe CLI | `~/.local/bin/vibe` (symlink to repo) |
 | Claude Code binary | `/usr/local/bin/claude` |
-| OAuth credentials | `~/.config/gcloud/credentials/claude-google-auth.json` |
+| OAuth credentials | `~/.config/gcloud/credentials/<profile>-google-auth.json` |
 | Google ADC | `~/.config/gcloud/application_default_credentials.json` |
 | AI Dev Kit | `~/.ai-dev-kit/` |
 | Claude skills | `~/.claude/skills/` |
-| Plugin cache | `~/.claude/plugins/cache/` |
+| Plugin cache | `~/.claude/plugins/cache/claude-vibe/` |
 | Plugin settings | `~/.claude/settings.json` |
 | MCP server config | `~/.claude.json` |
 | Environment vars | `~/.vibe/env` |
@@ -155,6 +191,9 @@ Run `vibe doctor` for automated diagnostics.
 
 **Plugins not loading after install**
 - Restart Claude Code — plugins load at startup
+
+**Plugin cache shows `individual-vibe-tool`**
+- Old installs cached under the previous name. Run `vibe install --step 6` to reinstall under `claude-vibe`
 
 ## License
 

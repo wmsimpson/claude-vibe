@@ -1,0 +1,8 @@
+{
+  "name": "fe-shared-resources",
+  "description": "Shared resource files (Python utilities, configs) used by multiple vibe plugins",
+  "version": "1.0.0",
+  "author": {
+    "name": "Databricks Field Engineering"
+  }
+}

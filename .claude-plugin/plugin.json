@@ -1,0 +1,29 @@
+{
+  "name": "claude-vibe",
+  "description": "Claude Vibe — Local AI development environment with plugins for Google Workspace, JIRA, Databricks, diagrams, and workflows",
+  "version": "1.0.0",
+  "author": {
+    "name": "Will Simpson"
+  },
+  "skills": [
+    "./plugins/fe-app-dev/skills/",
+    "./plugins/fe-databricks-tools/skills/",
+    "./plugins/fe-google-tools/skills/",
+    "./plugins/fe-jira-tools/skills/",
+    "./plugins/lean-sigma-tools/skills/",
+    "./plugins/fe-macos-scheduler/skills/",
+    "./plugins/fe-specialized-agents/skills/",
+    "./plugins/fe-vibe-setup/skills/",
+    "./plugins/fe-workflows/skills/"
+  ],
+  "agents": [
+    "./plugins/fe-databricks-tools/agents/databricks-apps-developer.md",
+    "./plugins/fe-google-tools/agents/google-drive.md",
+    "./plugins/fe-jira-tools/agents/jira-ticket-assistant.md",
+    "./plugins/fe-specialized-agents/agents/mermaid-diagrams.md",
+    "./plugins/fe-specialized-agents/agents/web-devloop-tester.md",
+    "./plugins/fe-vibe-setup/agents/vibe-profile.md",
+    "./plugins/fe-workflows/agents/databricks-feature-test-executor.md",
+    "./plugins/fe-workflows/agents/slack-discovery-agent.md"
+  ]
+}

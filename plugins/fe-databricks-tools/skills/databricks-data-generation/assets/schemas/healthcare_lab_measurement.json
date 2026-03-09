@@ -1,0 +1,202 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "name": "healthcare_lab_measurement",
+  "version": "1.0.0",
+  "description": "Lab measurements with visit-dependent treatment effects and reference ranges",
+  "industry": "healthcare",
+  "medallion_layer": "silver",
+  "typical_rows": {"min": 3000, "default": 6000, "max": 60000},
+  "relationships": [
+    {"child_of": "healthcare_study_participant", "fk_column": "participant_id", "fk_range": [30000, 99999]}
+  ],
+  "cdc": {"operations": {"APPEND": 85, "UPDATE": 10, "DELETE": 5}, "sequence_column": "operation_date"},
+  "data_quality": {"duplicate_rate": 0.0, "column_nulls": {}},
+  "columns": [
+    {
+      "name": "measurement_id",
+      "type": "integer",
+      "description": "Unique measurement identifier",
+      "generation": {
+        "minValue": 50000,
+        "maxValue": 99999,
+        "unique": true
+      }
+    },
+    {
+      "name": "participant_id",
+      "type": "integer",
+      "description": "Foreign key to study participants table",
+      "generation": {
+        "minValue": 30000,
+        "maxValue": 32999,
+        "random": true,
+        "notes": "maxValue is dynamically set to 30000 + n_participants - 1"
+      }
+    },
+    {
+      "name": "visit_number",
+      "type": "integer",
+      "description": "Study visit number (0=Screening through 6=End of Study)",
+      "generation": {
+        "minValue": 0,
+        "maxValue": 6,
+        "random": true
+      }
+    },
+    {
+      "name": "visit_name",
+      "type": "string",
+      "description": "Descriptive visit name (derived from visit_number)",
+      "generation": {
+        "baseColumn": "visit_number",
+        "expr": "CASE WHEN visit_number = 0 THEN 'Screening' WHEN visit_number = 1 THEN 'Baseline' WHEN visit_number = 2 THEN 'Week 4' WHEN visit_number = 3 THEN 'Week 8' WHEN visit_number = 4 THEN 'Week 12' WHEN visit_number = 5 THEN 'Week 24' ELSE 'End of Study' END"
+      }
+    },
+    {
+      "name": "visit_date",
+      "type": "date",
+      "description": "Date of the study visit",
+      "generation": {
+        "expr": "date_add('2020-01-01', cast(rand()*datediff('2024-12-31', '2020-01-01') as int))"
+      }
+    },
+    {
+      "name": "lab_test",
+      "type": "string",
+      "description": "Name of the laboratory test",
+      "generation": {
+        "values": ["Hemoglobin", "WBC Count", "ALT", "AST", "Creatinine", "BUN", "Glucose", "HbA1c", "LDL", "HDL"],
+        "weights": [2, 2, 1.5, 1.5, 1.5, 1, 1.5, 1.5, 1, 1]
+      }
+    },
+    {
+      "name": "result_value",
+      "type": "double",
+      "description": "Lab result value with visit-dependent treatment effects",
+      "generation": {
+        "baseColumn": ["lab_test", "visit_number"],
+        "expr": "CASE WHEN lab_test = 'Hemoglobin' THEN 10 + rand() * 8 + (visit_number * 0.2 * CASE WHEN rand() < 0.6 THEN 1 ELSE -0.5 END) WHEN lab_test = 'WBC Count' THEN 3 + rand() * 9 + (visit_number * 0.15 * CASE WHEN rand() < 0.6 THEN -1 ELSE 0.5 END) WHEN lab_test = 'ALT' THEN 10 + rand() * 80 + (visit_number * 2 * CASE WHEN rand() < 0.7 THEN -1 ELSE 1 END) WHEN lab_test = 'AST' THEN 10 + rand() * 80 + (visit_number * 1.8 * CASE WHEN rand() < 0.7 THEN -1 ELSE 1 END) WHEN lab_test = 'Creatinine' THEN 0.5 + rand() * 2 + (visit_number * 0.02 * CASE WHEN rand() < 0.5 THEN -1 ELSE 1 END) WHEN lab_test = 'BUN' THEN 7 + rand() * 23 + (visit_number * 0.5 * CASE WHEN rand() < 0.5 THEN -1 ELSE 1 END) WHEN lab_test = 'Glucose' THEN 70 + rand() * 100 + (visit_number * -2 * CASE WHEN rand() < 0.65 THEN 1 ELSE -0.5 END) WHEN lab_test = 'HbA1c' THEN 5.0 + rand() * 5 + (visit_number * -0.15 * CASE WHEN rand() < 0.65 THEN 1 ELSE -0.5 END) WHEN lab_test = 'LDL' THEN 80 + rand() * 120 + (visit_number * -3 * CASE WHEN rand() < 0.7 THEN 1 ELSE -0.3 END) WHEN lab_test = 'HDL' THEN 35 + rand() * 45 + (visit_number * 1 * CASE WHEN rand() < 0.6 THEN 1 ELSE -0.5 END) ELSE 50 + rand() * 100 END"
+      }
+    },
+    {
+      "name": "result_units",
+      "type": "string",
+      "description": "Unit of measurement for the lab result",
+      "generation": {
+        "baseColumn": "lab_test",
+        "expr": "CASE WHEN lab_test = 'Hemoglobin' THEN 'g/dL' WHEN lab_test = 'WBC Count' THEN '10E9/L' WHEN lab_test IN ('ALT', 'AST') THEN 'U/L' WHEN lab_test IN ('Creatinine', 'BUN', 'Glucose', 'LDL', 'HDL') THEN 'mg/dL' WHEN lab_test = 'HbA1c' THEN '%' ELSE 'units' END"
+      }
+    },
+    {
+      "name": "reference_min",
+      "type": "double",
+      "description": "Lower bound of the normal reference range",
+      "generation": {
+        "baseColumn": "lab_test",
+        "expr": "CASE WHEN lab_test = 'Hemoglobin' THEN 12.0 WHEN lab_test = 'WBC Count' THEN 4.0 WHEN lab_test = 'ALT' THEN 7.0 WHEN lab_test = 'AST' THEN 10.0 WHEN lab_test = 'Creatinine' THEN 0.6 WHEN lab_test = 'BUN' THEN 7.0 WHEN lab_test = 'Glucose' THEN 70.0 WHEN lab_test = 'HbA1c' THEN 4.0 WHEN lab_test = 'LDL' THEN 0.0 WHEN lab_test = 'HDL' THEN 40.0 ELSE 10.0 END"
+      }
+    },
+    {
+      "name": "reference_max",
+      "type": "double",
+      "description": "Upper bound of the normal reference range",
+      "generation": {
+        "baseColumn": "lab_test",
+        "expr": "CASE WHEN lab_test = 'Hemoglobin' THEN 16.0 WHEN lab_test = 'WBC Count' THEN 11.0 WHEN lab_test = 'ALT' THEN 56.0 WHEN lab_test = 'AST' THEN 40.0 WHEN lab_test = 'Creatinine' THEN 1.2 WHEN lab_test = 'BUN' THEN 20.0 WHEN lab_test = 'Glucose' THEN 99.0 WHEN lab_test = 'HbA1c' THEN 5.6 WHEN lab_test = 'LDL' THEN 100.0 WHEN lab_test = 'HDL' THEN 999.0 ELSE 100.0 END"
+      }
+    },
+    {
+      "name": "abnormal_flag",
+      "type": "boolean",
+      "description": "Whether the result is outside the reference range",
+      "generation": {
+        "baseColumn": ["result_value", "reference_min", "reference_max"],
+        "expr": "result_value < reference_min OR result_value > reference_max"
+      }
+    },
+    {
+      "name": "change_from_baseline",
+      "type": "double",
+      "description": "Absolute change from baseline (null for screening/baseline visits)",
+      "generation": {
+        "baseColumn": ["result_value", "visit_number"],
+        "expr": "CASE WHEN visit_number > 1 THEN (result_value - result_value * (1 - visit_number * 0.02)) ELSE NULL END"
+      }
+    },
+    {
+      "name": "percent_change_from_baseline",
+      "type": "double",
+      "description": "Percent change from baseline",
+      "generation": {
+        "baseColumn": ["change_from_baseline", "result_value"],
+        "expr": "CASE WHEN change_from_baseline IS NOT NULL THEN (change_from_baseline / result_value) * 100 ELSE NULL END"
+      }
+    },
+    {
+      "name": "clinically_significant",
+      "type": "boolean",
+      "description": "Whether the abnormality is clinically significant (>30% outside reference)",
+      "generation": {
+        "baseColumn": ["abnormal_flag", "result_value", "reference_min", "reference_max"],
+        "expr": "abnormal_flag AND (result_value < reference_min * 0.7 OR result_value > reference_max * 1.3)"
+      }
+    },
+    {
+      "name": "specimen_type",
+      "type": "string",
+      "description": "Type of biological specimen collected",
+      "generation": {
+        "values": ["Whole Blood", "Serum", "Plasma"],
+        "weights": [3, 5, 2]
+      }
+    },
+    {
+      "name": "fasting_status",
+      "type": "string",
+      "description": "Fasting status at time of sample collection",
+      "generation": {
+        "values": ["Fasting", "Non-Fasting", "Unknown"],
+        "weights": [4, 5, 1]
+      }
+    },
+    {
+      "name": "sample_quality",
+      "type": "string",
+      "description": "Quality assessment of the collected sample",
+      "generation": {
+        "values": ["Acceptable", "Hemolyzed", "Lipemic", "Icteric"],
+        "weights": [9, 0.5, 0.3, 0.2]
+      }
+    },
+    {
+      "name": "retest_flag",
+      "type": "boolean",
+      "description": "Whether the sample requires retesting",
+      "generation": {
+        "baseColumn": "sample_quality",
+        "expr": "CASE WHEN sample_quality != 'Acceptable' THEN true ELSE rand() < 0.03 END"
+      }
+    },
+    {
+      "name": "lab_technician",
+      "type": "string",
+      "description": "Name of the lab technician who processed the sample",
+      "pii": true,
+      "generation": {
+        "mimesis": "person.full_name"
+      }
+    },
+    {
+      "name": "reviewed_by_physician",
+      "type": "string",
+      "description": "Reviewing physician (derived with Dr. prefix)",
+      "pii": true,
+      "generation": {
+        "derived": true,
+        "mimesis_base": "person.full_name",
+        "expr": "concat('Dr. ', physician_name_base)",
+        "notes": "Uses omitted physician_name_base column with mimesis person.full_name"
+      }
+    }
+  ]
+}

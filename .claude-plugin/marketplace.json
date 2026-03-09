@@ -1,0 +1,144 @@
+{
+  "name": "claude-vibe",
+  "owner": {
+    "name": "Will Simpson"
+  },
+  "metadata": {
+    "description": "Personal Claude Code toolkit: Databricks, Google Workspace, JIRA, diagrams, and workflows",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "fe-app-dev",
+      "source": "./plugins/fe-app-dev",
+      "description": "Mobile and web app development workflows — scaffold new apps (React Native, Expo, Next.js, Swift, Flutter), GitHub workflow management, deployment (Vercel, Netlify, App Store, EAS), and debugging",
+      "version": "1.0.0",
+      "author": {
+        "name": "Will Simpson"
+      },
+      "category": "development",
+      "keywords": ["react-native", "expo", "ios", "android", "mobile", "web", "nextjs", "vercel", "github", "deployment", "debug"]
+    },
+    {
+      "name": "fe-databricks-tools",
+      "source": "./plugins/fe-databricks-tools",
+      "description": "Databricks workflow tools: authentication, queries, deployments, workspace setup, apps, and demos",
+      "version": "1.0.0",
+      "author": {
+        "name": "Will Simpson"
+      },
+      "category": "productivity",
+      "keywords": ["databricks", "deployment", "workspace", "sql"]
+    },
+    {
+      "name": "fe-google-tools",
+      "source": "./plugins/fe-google-tools",
+      "description": "Google Docs, Sheets, Slides, Drive, Gmail, Calendar, Tasks, and Forms with professional formatting, charts, formulas, and hyperlinks",
+      "version": "1.1.4",
+      "author": {
+        "name": "Databricks Field Engineering"
+      },
+      "category": "productivity",
+      "keywords": ["google", "docs", "sheets", "slides", "drive", "spreadsheet", "gmail", "calendar", "tasks", "forms"]
+    },
+    {
+      "name": "fe-specialized-agents",
+      "source": "./plugins/fe-specialized-agents",
+      "description": "Specialized agents for web dev testing and diagram generation",
+      "version": "1.0.0",
+      "author": {
+        "name": "Databricks Field Engineering"
+      },
+      "category": "development",
+      "keywords": ["agents", "cli", "diagrams", "testing"]
+    },
+    {
+      "name": "fe-vibe-setup",
+      "source": "./plugins/fe-vibe-setup",
+      "description": "Setup, configuration, and validation for the vibe environment",
+      "version": "1.0.0",
+      "author": {
+        "name": "Will Simpson"
+      },
+      "category": "setup",
+      "keywords": ["setup", "configuration", "validation"]
+    },
+    {
+      "name": "fe-mcp-servers",
+      "source": "./plugins/fe-mcp-servers",
+      "description": "Custom MCP servers framework (future-ready)",
+      "version": "1.0.0",
+      "author": {
+        "name": "Databricks Field Engineering"
+      },
+      "category": "integration",
+      "keywords": ["mcp", "servers"]
+    },
+    {
+      "name": "fe-shared-resources",
+      "source": "./plugins/fe-shared-resources",
+      "description": "Shared resource files (Python utilities, configs) used by multiple plugins",
+      "version": "1.0.0",
+      "author": {
+        "name": "Databricks Field Engineering"
+      },
+      "category": "infrastructure",
+      "keywords": ["shared", "resources", "utilities"]
+    },
+    {
+      "name": "fe-jira-tools",
+      "source": "./plugins/fe-jira-tools",
+      "description": "JIRA ticket operations: search, view, comment, and create tickets (configurable for any JIRA instance)",
+      "version": "1.0.0",
+      "author": {
+        "name": "Will Simpson"
+      },
+      "category": "productivity",
+      "keywords": ["jira", "tickets", "atlassian"]
+    },
+    {
+      "name": "fe-workflows",
+      "source": "./plugins/fe-workflows",
+      "description": "Workflows for sizing, documentation, security, support, troubleshooting, competitive analysis, architecture diagrams, and more",
+      "version": "1.0.0",
+      "author": {
+        "name": "Will Simpson"
+      },
+      "category": "productivity",
+      "keywords": [
+        "workflows",
+        "sizing",
+        "poc",
+        "security",
+        "support",
+        "troubleshooting",
+        "performance",
+        "compete",
+        "competitive",
+        "architecture"
+      ]
+    },
+    {
+      "name": "fe-macos-scheduler",
+      "source": "./plugins/fe-macos-scheduler",
+      "description": "Schedule and manage recurring local macOS launchd tasks. Create tasks that run Claude prompts on intervals, calendar schedules, or file-change watchers.",
+      "version": "1.0.4",
+      "author": {
+        "name": "Databricks Field Engineering"
+      },
+      "category": "productivity",
+      "keywords": ["scheduler", "launchd", "cron", "background", "automation", "macos"]
+    },
+    {
+      "name": "lean-sigma-tools",
+      "source": "./plugins/lean-sigma-tools",
+      "description": "Lean Six Sigma process improvement skills: SIPOC diagrams, FMEA risk tables, and swimlane process maps",
+      "version": "1.0.0",
+      "author": {
+        "name": "Craig Lukasik"
+      },
+      "category": "productivity",
+      "keywords": ["lean", "six-sigma", "SIPOC", "FMEA", "process-map", "dmaic", "risk"]
+    }
+  ]
+}

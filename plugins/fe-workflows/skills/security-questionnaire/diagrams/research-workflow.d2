@@ -1,0 +1,96 @@
+direction: down
+
+title: Research Priority Order {
+  shape: text
+  style.font-size: 20
+}
+
+question: "Question to Answer" {
+  shape: oval
+  style.fill: "#e3f2fd"
+}
+
+# Primary
+primary: "1. PRIMARY: SQRC Search" {
+  shape: rectangle
+  style.fill: "#c8e6c9"
+  style.stroke: "#4caf50"
+  style.stroke-width: 3
+}
+
+primary_action: |md
+  - Search Glean for "SQRC [topic]"
+  - **Copy-paste** the detailed answer
+  - Do NOT paraphrase or summarize
+  - Target: 90-95% from SQRC
+| {
+  shape: text
+}
+
+# Secondary
+secondary: "2. SECONDARY: Supporting Evidence" {
+  shape: rectangle
+  style.fill: "#fff9c4"
+}
+
+secondary_action: |md
+  - Trust Center docs
+  - Security policies
+  - Compliance certificates
+  - SOC 2, ISO certs
+| {
+  shape: text
+}
+
+# Tertiary
+tertiary: "3. TERTIARY: Public Documentation" {
+  shape: rectangle
+  style.fill: "#ffe0b2"
+}
+
+tertiary_action: |md
+  - databricks.com/trust
+  - Security features docs
+  - Legal documentation
+| {
+  shape: text
+}
+
+# Never
+never: "NEVER: GenAI Tools" {
+  shape: hexagon
+  style.fill: "#ff4444"
+  style.font-color: white
+}
+
+never_action: |md
+  - No Glean Chat
+  - No Perplexity
+  - No ChatGPT
+  - No AI-generated summaries
+| {
+  shape: text
+}
+
+answer: "Completed Answer" {
+  shape: oval
+  style.fill: "#c8e6c9"
+}
+
+# Flow
+question -> primary
+primary -> primary_action
+primary_action -> secondary: "Need more evidence"
+
+secondary -> secondary_action
+secondary_action -> tertiary: "Need public refs"
+
+tertiary -> tertiary_action
+tertiary_action -> answer
+
+primary_action -> answer: "SQRC has complete answer"
+
+never -> question: "X" {
+  style.stroke: "#ff4444"
+  style.stroke-width: 3
+}

@@ -1,0 +1,189 @@
+# MCP Server Configurations
+# These servers will be merged into ~/.claude.json by `vibe install`.
+#
+# ACTIVE: chrome-devtools (always on — required for visual debugging)
+# OPTIONAL: Uncomment any section below and run `vibe install` to activate it.
+#           The setup-integrations skill will prompt you and configure these
+#           automatically when you run /setup-integrations.
+#
+# Priority: open-source / free-tier options are listed first.
+# ============================================================================
+
+servers:
+
+  # --------------------------------------------------------------------------
+  # ACTIVE: Chrome DevTools MCP
+  # Purpose: Visual browser automation, screenshots, JS evaluation, DOM access
+  # Requires: Node.js + npx (no auth, no account needed)
+  # Docs: https://github.com/AgentDeskAI/chrome-devtools-mcp
+  # --------------------------------------------------------------------------
+  chrome-devtools:
+    command: npx
+    args:
+      - "chrome-devtools-mcp@latest"
+      - "--userDataDir=~/.vibe/chrome/profile"
+
+  # --------------------------------------------------------------------------
+  # OPTIONAL: GitHub MCP  [OPEN SOURCE — FREE]
+  # Purpose: Repos, PRs, issues, releases, GitHub Actions, code search
+  # Requires: Free GitHub account + personal access token (PAT)
+  # Create token: https://github.com/settings/tokens (needs: repo, read:user)
+  # Docs: https://github.com/github/github-mcp-server
+  # Setup: Run /setup-integrations and select GitHub
+  # --------------------------------------------------------------------------
+  # github:
+  #   command: npx
+  #   args:
+  #     - "-y"
+  #     - "@modelcontextprotocol/server-github"
+  #   env:
+  #     GITHUB_PERSONAL_ACCESS_TOKEN: "ghp_your_token_here"
+
+  # --------------------------------------------------------------------------
+  # OPTIONAL: Slack MCP  [OPEN SOURCE — FREE TIER AVAILABLE]
+  # Purpose: Read/send Slack messages, search channels, manage DMs
+  # Requires: Slack workspace (free tier OK) + Slack app bot token
+  # Create app: https://api.slack.com/apps → New App → Bot Token Scopes:
+  #   channels:history, channels:read, chat:write, groups:history,
+  #   groups:read, im:history, mpim:history, reactions:read, users:read
+  # Docs: https://github.com/modelcontextprotocol/servers/tree/main/src/slack
+  # Setup: Run /setup-integrations and select Slack
+  # --------------------------------------------------------------------------
+  # slack:
+  #   command: npx
+  #   args:
+  #     - "-y"
+  #     - "@modelcontextprotocol/server-slack"
+  #   env:
+  #     SLACK_BOT_TOKEN: "xoxb-your-token-here"
+  #     SLACK_TEAM_ID: "T0XXXXXXXXX"
+
+  # --------------------------------------------------------------------------
+  # OPTIONAL: JIRA MCP  [OPEN SOURCE — FREE TIER AVAILABLE]
+  # Purpose: Create/search/update JIRA issues and Confluence pages
+  # Requires: Atlassian account (free tier at atlassian.com/software/jira/free)
+  # Create API token: https://id.atlassian.com/manage-profile/security/api-tokens
+  # Docs: https://github.com/sooperset/mcp-atlassian
+  # Setup: Run /setup-integrations and select JIRA
+  # --------------------------------------------------------------------------
+  # jira:
+  #   command: uvx
+  #   args:
+  #     - "mcp-atlassian"
+  #   env:
+  #     JIRA_URL: "https://your-org.atlassian.net"
+  #     JIRA_USERNAME: "your-email@example.com"
+  #     JIRA_API_TOKEN: "your-api-token"
+  #     MCP_PRIVACY_SUMMARIZATION_ENABLED: "false"
+
+  # --------------------------------------------------------------------------
+  # OPTIONAL: Confluence MCP  [same package as JIRA above]
+  # Purpose: Read/create/update Confluence wiki pages and spaces
+  # Requires: Same Atlassian account + API token as JIRA above
+  # Docs: https://github.com/sooperset/mcp-atlassian
+  # Setup: Run /setup-integrations and select Confluence
+  # --------------------------------------------------------------------------
+  # confluence:
+  #   command: uvx
+  #   args:
+  #     - "mcp-atlassian"
+  #   env:
+  #     CONFLUENCE_URL: "https://your-org.atlassian.net/wiki"
+  #     CONFLUENCE_USERNAME: "your-email@example.com"
+  #     CONFLUENCE_API_TOKEN: "your-api-token"
+
+  # --------------------------------------------------------------------------
+  # OPTIONAL: Brave Search MCP  [OPEN SOURCE — FREE TIER AVAILABLE]
+  # Purpose: Real-time web search results (1000 free queries/month)
+  # Requires: Free API key at https://brave.com/search/api/
+  # Docs: https://github.com/modelcontextprotocol/servers/tree/main/src/brave-search
+  # Setup: Run /setup-integrations and select Brave Search
+  # --------------------------------------------------------------------------
+  # brave-search:
+  #   command: npx
+  #   args:
+  #     - "-y"
+  #     - "@modelcontextprotocol/server-brave-search"
+  #   env:
+  #     BRAVE_API_KEY: "BSA-your-api-key-here"
+
+  # --------------------------------------------------------------------------
+  # OPTIONAL: Notion MCP  [OPEN SOURCE — FREE TIER AVAILABLE]
+  # Purpose: Read/create/update Notion pages, databases, and blocks
+  # Requires: Free Notion account + integration token
+  # Create token: https://www.notion.so/my-integrations → New integration
+  # Docs: https://github.com/modelcontextprotocol/servers/tree/main/src/notion
+  # Setup: Run /setup-integrations and select Notion
+  # --------------------------------------------------------------------------
+  # notion:
+  #   command: npx
+  #   args:
+  #     - "-y"
+  #     - "@modelcontextprotocol/server-notion"
+  #   env:
+  #     NOTION_API_TOKEN: "secret_your_integration_token_here"
+
+  # --------------------------------------------------------------------------
+  # OPTIONAL: Linear MCP  [OPEN SOURCE — FREE TIER AVAILABLE]
+  # Purpose: Issue tracking, project management, engineering sprints
+  # Requires: Free Linear account (linear.app) + API key
+  # Create key: Linear → Settings → API → Personal API keys
+  # Docs: https://github.com/jerhadf/linear-mcp-server
+  # Setup: Run /setup-integrations and select Linear
+  # --------------------------------------------------------------------------
+  # linear:
+  #   command: npx
+  #   args:
+  #     - "-y"
+  #     - "linear-mcp-server"
+  #   env:
+  #     LINEAR_API_KEY: "lin_api_your_key_here"
+
+  # --------------------------------------------------------------------------
+  # OPTIONAL: Supabase MCP  [OPEN SOURCE — FREE TIER AVAILABLE]
+  # Purpose: Postgres DB, auth, storage, real-time — backend for apps
+  # Requires: Free Supabase project (supabase.com) + service role key
+  # Create project: https://app.supabase.com → New project
+  # Docs: https://github.com/supabase-community/supabase-mcp
+  # Setup: Run /setup-integrations and select Supabase
+  # --------------------------------------------------------------------------
+  # supabase:
+  #   command: npx
+  #   args:
+  #     - "-y"
+  #     - "@supabase/mcp-server-supabase@latest"
+  #     - "--read-only"
+  #   env:
+  #     SUPABASE_ACCESS_TOKEN: "sbp_your_access_token"
+
+  # --------------------------------------------------------------------------
+  # OPTIONAL: Memory MCP  [OPEN SOURCE — NO ACCOUNT NEEDED]
+  # Purpose: Persistent in-session memory / knowledge graph stored locally
+  # Requires: Node.js only — stores data in ~/.vibe/memory/
+  # Docs: https://github.com/modelcontextprotocol/servers/tree/main/src/memory
+  # --------------------------------------------------------------------------
+  # memory:
+  #   command: npx
+  #   args:
+  #     - "-y"
+  #     - "@modelcontextprotocol/server-memory"
+  #   env:
+  #     MEMORY_FILE_PATH: "~/.vibe/memory/graph.json"
+
+  # --------------------------------------------------------------------------
+  # OPTIONAL: Fetch MCP  [OPEN SOURCE — NO ACCOUNT NEEDED]
+  # Purpose: Fetch and parse any web page or API endpoint as markdown
+  # Requires: Python + uvx only — no auth needed
+  # Docs: https://github.com/modelcontextprotocol/servers/tree/main/src/fetch
+  # --------------------------------------------------------------------------
+  # fetch:
+  #   command: uvx
+  #   args:
+  #     - "mcp-server-fetch"
+
+  # --------------------------------------------------------------------------
+  # NOTE: Glean MCP
+  # Glean is an enterprise AI search tool — requires a company Glean subscription.
+  # Not suitable for personal use. If your org uses Glean:
+  # See: https://www.glean.com/docs/api/mcp
+  # --------------------------------------------------------------------------

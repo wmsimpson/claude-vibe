@@ -1,0 +1,30 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#FF3621', 'primaryTextColor': '#333', 'primaryBorderColor': '#FF3621', 'lineColor': '#333', 'actorTextColor': '#333'}}}%%
+
+sequenceDiagram
+    autonumber
+
+    participant Client as Client App
+    participant API as API Gateway
+    participant Auth as Auth Service
+    participant Service as Business Service
+    participant Databricks as Databricks
+    participant Cache as Redis Cache
+
+    Client->>API: POST /api/query
+    API->>Auth: Validate Token
+    Auth-->>API: Token Valid
+
+    API->>Service: Forward Request
+    Service->>Cache: Check Cache
+    Cache-->>Service: Cache Miss
+
+    Service->>Databricks: Execute SQL Query
+    Note over Service,Databricks: Query executes on SQL Warehouse
+
+    Databricks-->>Service: Query Results
+
+    Service->>Cache: Store in Cache
+    Cache-->>Service: Cached
+
+    Service-->>API: Response
+    API-->>Client: 200 OK + Data

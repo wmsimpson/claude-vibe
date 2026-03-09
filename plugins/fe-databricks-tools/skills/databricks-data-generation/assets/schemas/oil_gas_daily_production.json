@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "name": "oil_gas_daily_production",
+  "version": "1.0.0",
+  "description": "Daily oil production data per well using ARPS decline curve formula with shut-in simulation",
+  "industry": "oil_gas",
+  "medallion_layer": "silver",
+  "typical_rows": {"min": 100, "default": 500, "max": 700, "note": "per well; days of production randomly selected between 100 and 700"},
+  "generation_pattern": "per_well_iteration",
+  "relationships": [
+    {"child_of": "oil_gas_well_header", "fk_column": "well_num", "references": "API_NUMBER"}
+  ],
+  "arps_formula": {
+    "expression": "(q_i * q_i_multiplier) / power(1 + b * d * variation * day_from_first_production, 1/b)",
+    "description": "ARPS hyperbolic decline with shut-in multiplier and production variation"
+  },
+  "columns": [
+    {
+      "name": "well_num",
+      "type": "bigint",
+      "description": "Well API number (foreign key to well headers)",
+      "generation": {
+        "values": ["__WELL_API_NUMBER__"],
+        "note": "Set from well header API_NUMBER in per-well loop"
+      }
+    },
+    {
+      "name": "day_from_first_production",
+      "type": "integer",
+      "description": "Day index from first production",
+      "generation": {
+        "minValue": 1,
+        "maxValue": 1000
+      }
+    },
+    {
+      "name": "first_production_date",
+      "type": "date",
+      "description": "Date of first production for this well",
+      "generation": {
+        "values": ["__COMPUTED__"],
+        "note": "date.today() - timedelta(days=days_to_generate)"
+      }
+    },
+    {
+      "name": "date",
+      "type": "date",
+      "description": "Calendar date of production",
+      "generation": {
+        "expr": "date_add(first_production_date, day_from_first_production)"
+      }
+    },
+    {
+      "name": "q_i",
+      "type": "double",
+      "description": "ARPS initial production rate (BOPD) from well header",
+      "generation": {
+        "values": ["__Q_I__"],
+        "note": "Passed from well header q_i"
+      }
+    },
+    {
+      "name": "d",
+      "type": "double",
+      "description": "ARPS initial decline rate from well header",
+      "generation": {
+        "values": ["__D__"],
+        "note": "Passed from well header d"
+      }
+    },
+    {
+      "name": "b",
+      "type": "double",
+      "description": "ARPS b-factor from well header",
+      "generation": {
+        "values": ["__B__"],
+        "note": "Passed from well header b"
+      }
+    },
+    {
+      "name": "q_i_multiplier",
+      "type": "double",
+      "description": "Production multiplier (1.0 = normal, 0 = shut-in)",
+      "generation": {
+        "values": [1.0, 0],
+        "weights": [97, 3],
+        "random": true,
+        "note": "97% normal production, 3% shut-in days"
+      }
+    },
+    {
+      "name": "variation",
+      "type": "double",
+      "description": "Random production variation factor",
+      "generation": {
+        "expr": "rand() * 0.1 + 0.95",
+        "note": "Range 0.95 to 1.05 simulating measurement noise"
+      }
+    },
+    {
+      "name": "actuals_bopd",
+      "type": "double",
+      "description": "Actual oil production in barrels per day",
+      "generation": {
+        "baseColumn": ["q_i", "d", "b", "q_i_multiplier", "variation"],
+        "expr": "(q_i * q_i_multiplier) / power(1 + b * d * variation * day_from_first_production, 1/b)"
+      }
+    }
+  ]
+}

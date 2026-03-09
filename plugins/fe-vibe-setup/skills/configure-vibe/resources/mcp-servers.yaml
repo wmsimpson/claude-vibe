@@ -1,0 +1,46 @@
+# MCP Server Configurations
+# These servers will be merged into ~/.claude.json
+#
+# IMPORTANT: These are external MCP servers provided by another team.
+# The paths below assume servers are installed at ~/mcp/servers/
+# The install script will expand ~ paths automatically during merge.
+
+servers:
+  chrome-devtools:
+    command: npx
+    args:
+      - "chrome-devtools-mcp@latest"
+      - "--userDataDir=~/.vibe/chrome/profile"
+      
+  glean:
+    command: python3.10
+    args:
+      - "~/mcp/servers/glean_mcp/glean_mcp_deploy.pex"
+    env:
+      I_DANGEROUSLY_OPT_IN_TO_UNSUPPORTED_ALPHA_TOOLS: "true"
+    type: stdio
+
+  slack:
+    command: python3.10
+    args:
+      - "~/mcp/servers/slack_mcp/slack_mcp_deploy.pex"
+    env:
+      I_DANGEROUSLY_OPT_IN_TO_UNSUPPORTED_ALPHA_TOOLS: "true"
+    type: stdio
+
+  jira:
+    command: python3.10
+    args:
+      - "~/mcp/servers/jira_mcp/jira_mcp_deploy.pex"
+    env:
+      I_DANGEROUSLY_OPT_IN_TO_UNSUPPORTED_ALPHA_TOOLS: "true"
+      MCP_PRIVACY_SUMMARIZATION_ENABLED: "false"
+    type: stdio
+
+  confluence:
+    command: python3.10
+    args:
+      - "~/mcp/servers/confluence_mcp/confluence_mcp_deploy.pex"
+    env:
+      I_DANGEROUSLY_OPT_IN_TO_UNSUPPORTED_ALPHA_TOOLS: "true"
+    type: stdio
