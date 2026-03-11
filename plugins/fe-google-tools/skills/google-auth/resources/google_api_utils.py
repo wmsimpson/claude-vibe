@@ -15,7 +15,7 @@ import random
 import shutil
 import subprocess
 import time
-from typing import Dict, Optional
+from typing import Dict, Optional, Tuple
 import urllib.parse
 
 
@@ -32,6 +32,17 @@ QUOTA_PROJECT = os.environ.get("GCP_QUOTA_PROJECT", "")
 
 # HTTP status codes that are safe to retry
 RETRYABLE_STATUS_CODES = {429, 500, 502, 503, 504}
+
+# Cache access tokens for 50 minutes (tokens last 60 min, 10 min safety margin)
+_TOKEN_CACHE_TTL = 50 * 60
+
+
+# =============================================================================
+# Token cache
+# =============================================================================
+
+_cached_token: Optional[str] = None
+_cached_token_time: float = 0.0
 
 
 # =============================================================================
@@ -87,9 +98,15 @@ def find_gcloud() -> Optional[str]:
 # Authentication
 # =============================================================================
 
-def get_access_token() -> str:
+def get_access_token(force_refresh: bool = False) -> str:
     """
-    Get an access token from gcloud ADC.
+    Get an access token from gcloud ADC, with module-level caching.
+
+    Tokens are cached for 50 minutes (they expire after 60). This avoids
+    hitting Google's OAuth token grant rate limit when making many API calls.
+
+    Args:
+        force_refresh: If True, bypass the cache and fetch a fresh token
 
     Returns:
         Access token string
@@ -97,6 +114,16 @@ def get_access_token() -> str:
     Raises:
         RuntimeError: If gcloud is not found or token retrieval fails
     """
+    global _cached_token, _cached_token_time
+
+    # Return cached token if still valid
+    if (
+        not force_refresh
+        and _cached_token
+        and (time.time() - _cached_token_time) < _TOKEN_CACHE_TTL
+    ):
+        return _cached_token
+
     gcloud_path = find_gcloud()
     if not gcloud_path:
         raise RuntimeError(
@@ -113,7 +140,10 @@ def get_access_token() -> str:
             f"Failed to get access token: {result.stderr.strip()}\n"
             "Re-run /google-auth to refresh credentials."
         )
-    return result.stdout.strip()
+
+    _cached_token = result.stdout.strip()
+    _cached_token_time = time.time()
+    return _cached_token
 
 
 # =============================================================================
@@ -157,25 +187,25 @@ def api_call_with_retry(
         query_string = urllib.parse.urlencode(params)
         url = f"{url}?{query_string}"
 
-    cmd = [
-        "curl", "-s",
-        "--max-time", str(timeout),
-        "-X", method,
-        url,
-        "-H", f"Authorization: Bearer {token}",
-        "-H", "Content-Type: application/json",
-    ]
-
-    # Only add quota project header if configured (required for some APIs like Sheets/Slides)
-    if QUOTA_PROJECT:
-        cmd.extend(["-H", f"x-goog-user-project: {QUOTA_PROJECT}"])
-
-    if data:
-        cmd.extend(["-d", json.dumps(data)])
-
+    data_json = json.dumps(data) if data else None
     last_error: Optional[str] = None
 
     for attempt in range(max_retries):
+        cmd = [
+            "curl", "-s",
+            "--max-time", str(timeout),
+            "-X", method,
+            url,
+            "-H", f"Authorization: Bearer {token}",
+            "-H", "Content-Type: application/json",
+        ]
+
+        if QUOTA_PROJECT:
+            cmd.extend(["-H", f"x-goog-user-project: {QUOTA_PROJECT}"])
+
+        if data_json:
+            cmd.extend(["-d", data_json])
+
         result = subprocess.run(cmd, capture_output=True, text=True)
 
         if result.returncode != 0:
@@ -196,13 +226,18 @@ def api_call_with_retry(
                 # No error — success
                 return response
 
+            if error_code == 401:
+                # Token expired/invalid — refresh once and retry
+                token = get_access_token(force_refresh=True)
+                continue
+
             if error_code in RETRYABLE_STATUS_CODES:
-                # Rate limit or transient server error — retry
+                # Rate limit or transient server error — retry with same token
                 last_error = (
                     f"HTTP {error_code}: {error_obj.get('message', 'unknown error')}"
                 )
             else:
-                # Non-retryable error (400, 401, 403, 404, etc.)
+                # Non-retryable error (400, 403, 404, etc.)
                 raise RuntimeError(
                     f"API error {error_code}: {error_obj.get('message', 'unknown error')}"
                 )
