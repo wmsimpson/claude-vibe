@@ -1,0 +1,9 @@
+{
+  "name": "macos-scheduler",
+  "description": "Schedule and manage recurring local macOS launchd tasks on this computer. Create tasks that run Claude prompts on intervals, calendar schedules, or file-change watchers. List, run, view logs, and remove scheduled tasks. NOT for Databricks jobs or cloud workloads.",
+  "version": "1.0.4",
+  "author": {
+    "name": "Databricks Field Engineering"
+  },
+  "skills": "./skills/"
+}

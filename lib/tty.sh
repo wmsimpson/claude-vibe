@@ -273,6 +273,36 @@ exit(0 if '$step' in s['completed_steps'] else 1)
 " 2>/dev/null
 }
 
+set_state_flag() {
+  local key="$1"
+  local value="$2"
+  python3 -c "
+import json, os
+p = os.path.expanduser('$STATE_FILE')
+with open(p) as f: s = json.load(f)
+s['$key'] = $value
+with open(p, 'w') as f: json.dump(s, f, indent=2)
+" 2>/dev/null
+}
+
+get_state_flag() {
+  local key="$1"
+  local default="${2:-false}"
+  python3 -c "
+import json, os
+p = os.path.expanduser('$STATE_FILE')
+with open(p) as f: s = json.load(f)
+v = s.get('$key')
+if v is None: print('$default')
+elif v: print('true')
+else: print('false')
+" 2>/dev/null
+}
+
+is_databricks_enabled() {
+  [[ "$(get_state_flag databricks_enabled false)" == "true" ]]
+}
+
 # ── Requirement checks ──────────────────────────────────────────────────────
 
 require_command() {

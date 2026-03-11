@@ -1,9 +1,0 @@
-{
-  "name": "fe-specialized-agents",
-  "description": "Specialized agents for CLI execution, web dev testing, and diagram generation",
-  "version": "1.0.0",
-  "author": {
-    "name": "Databricks Field Engineering"
-  },
-  "skills": "./skills/"
-}

@@ -6,24 +6,24 @@
     "name": "Will Simpson"
   },
   "skills": [
-    "./plugins/fe-app-dev/skills/",
-    "./plugins/fe-databricks-tools/skills/",
-    "./plugins/fe-google-tools/skills/",
-    "./plugins/fe-jira-tools/skills/",
+    "./plugins/app-dev/skills/",
+    "./plugins/databricks-tools/skills/",
+    "./plugins/google-tools/skills/",
+    "./plugins/jira-tools/skills/",
     "./plugins/lean-sigma-tools/skills/",
-    "./plugins/fe-macos-scheduler/skills/",
-    "./plugins/fe-specialized-agents/skills/",
-    "./plugins/fe-vibe-setup/skills/",
-    "./plugins/fe-workflows/skills/"
+    "./plugins/macos-scheduler/skills/",
+    "./plugins/specialized-agents/skills/",
+    "./plugins/vibe-setup/skills/",
+    "./plugins/workflows/skills/"
   ],
   "agents": [
-    "./plugins/fe-databricks-tools/agents/databricks-apps-developer.md",
-    "./plugins/fe-google-tools/agents/google-drive.md",
-    "./plugins/fe-jira-tools/agents/jira-ticket-assistant.md",
-    "./plugins/fe-specialized-agents/agents/mermaid-diagrams.md",
-    "./plugins/fe-specialized-agents/agents/web-devloop-tester.md",
-    "./plugins/fe-vibe-setup/agents/vibe-profile.md",
-    "./plugins/fe-workflows/agents/databricks-feature-test-executor.md",
-    "./plugins/fe-workflows/agents/slack-discovery-agent.md"
+    "./plugins/databricks-tools/agents/databricks-apps-developer.md",
+    "./plugins/google-tools/agents/google-drive.md",
+    "./plugins/jira-tools/agents/jira-ticket-assistant.md",
+    "./plugins/specialized-agents/agents/mermaid-diagrams.md",
+    "./plugins/specialized-agents/agents/web-devloop-tester.md",
+    "./plugins/vibe-setup/agents/vibe-profile.md",
+    "./plugins/workflows/agents/databricks-feature-test-executor.md",
+    "./plugins/workflows/agents/slack-discovery-agent.md"
   ]
 }

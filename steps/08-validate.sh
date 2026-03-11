@@ -89,17 +89,19 @@ step_validate() {
     ((warn++))
   fi
 
-  # ── Databricks AI Dev Kit ──────────────────────────────────────────────
-  print_blank
-  print_step "Databricks AI Dev Kit"
-  local skill_count
-  skill_count=$(ls "$HOME/.claude/skills/" 2>/dev/null | wc -l | tr -d ' ')
-  if [[ $skill_count -gt 0 ]]; then
-    print_success "$skill_count skills in ~/.claude/skills/"
-    ((pass++))
-  else
-    print_warn "No skills found in ~/.claude/skills/"
-    ((warn++))
+  # ── Databricks AI Dev Kit (optional) ──────────────────────────────────
+  if is_databricks_enabled; then
+    print_blank
+    print_step "Databricks AI Dev Kit"
+    local skill_count
+    skill_count=$(ls "$HOME/.claude/skills/" 2>/dev/null | wc -l | tr -d ' ')
+    if [[ $skill_count -gt 0 ]]; then
+      print_success "$skill_count skills in ~/.claude/skills/"
+      ((pass++))
+    else
+      print_warn "No skills found in ~/.claude/skills/"
+      ((warn++))
+    fi
   fi
 
   # ── Plugins ─────────────────────────────────────────────────────────────

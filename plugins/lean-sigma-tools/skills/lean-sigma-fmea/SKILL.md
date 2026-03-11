@@ -132,7 +132,7 @@ Use the rating scales in `resources/rating_scales.md` to assign:
 Use the `google-sheets` skill. Authenticate first:
 
 ```bash
-TOKEN=$(python3 ~/.claude/plugins/cache/fe-vibe/fe-google-tools/*/skills/google-auth/resources/google_auth.py token)
+TOKEN=$(python3 ~/.claude/plugins/cache/claude-vibe/google-tools/*/skills/google-auth/resources/google_auth.py token)
 ```
 
 Create a spreadsheet with **three sheets**:

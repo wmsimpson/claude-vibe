@@ -103,7 +103,7 @@ Add a **"WA Pillar Tags"** column to the Process section of the SIPOC.
 Use the `google-sheets` skill. Authenticate first:
 
 ```bash
-TOKEN=$(python3 ~/.claude/plugins/cache/fe-vibe/fe-google-tools/*/skills/google-auth/resources/google_auth.py token)
+TOKEN=$(python3 ~/.claude/plugins/cache/claude-vibe/google-tools/*/skills/google-auth/resources/google_auth.py token)
 ```
 
 Create a spreadsheet with **two sheets**:
@@ -248,7 +248,7 @@ Convert to PNG and Lucid Chart XML:
 
 ```bash
 # Primary: use the lucid-diagram conversion script
-python3 ~/.claude/plugins/cache/fe-vibe/fe-specialized-agents/*/skills/lucid-diagram/scripts/convert_to_lucid.py \
+python3 ~/.claude/plugins/cache/claude-vibe/specialized-agents/*/skills/lucid-diagram/scripts/convert_to_lucid.py \
   /tmp/sipoc_[process_name].dot /tmp/sipoc_[process_name].xml
 ```
 

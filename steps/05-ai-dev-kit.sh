@@ -4,6 +4,13 @@
 step_ai_dev_kit() {
   print_header "Step 5 of 8 — Databricks AI Dev Kit"
 
+  if ! is_databricks_enabled; then
+    print_info "Databricks integration is not enabled — skipping AI Dev Kit."
+    print_info "To enable, run: ${CYAN}vibe install --step 5${NC}"
+    mark_step_complete "ai_dev_kit"
+    return 0
+  fi
+
   local skills_dir="$HOME/.claude/skills"
   local aidk_dir="$HOME/.ai-dev-kit"
 

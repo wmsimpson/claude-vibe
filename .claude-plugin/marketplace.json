@@ -9,8 +9,8 @@
   },
   "plugins": [
     {
-      "name": "fe-app-dev",
-      "source": "./plugins/fe-app-dev",
+      "name": "app-dev",
+      "source": "./plugins/app-dev",
       "description": "Mobile and web app development workflows — scaffold new apps (React Native, Expo, Next.js, Swift, Flutter), GitHub workflow management, deployment (Vercel, Netlify, App Store, EAS), and debugging",
       "version": "1.0.0",
       "author": {
@@ -20,8 +20,8 @@
       "keywords": ["react-native", "expo", "ios", "android", "mobile", "web", "nextjs", "vercel", "github", "deployment", "debug"]
     },
     {
-      "name": "fe-databricks-tools",
-      "source": "./plugins/fe-databricks-tools",
+      "name": "databricks-tools",
+      "source": "./plugins/databricks-tools",
       "description": "Databricks workflow tools: authentication, queries, deployments, workspace setup, apps, and demos",
       "version": "1.0.0",
       "author": {
@@ -31,8 +31,8 @@
       "keywords": ["databricks", "deployment", "workspace", "sql"]
     },
     {
-      "name": "fe-google-tools",
-      "source": "./plugins/fe-google-tools",
+      "name": "google-tools",
+      "source": "./plugins/google-tools",
       "description": "Google Docs, Sheets, Slides, Drive, Gmail, Calendar, Tasks, and Forms with professional formatting, charts, formulas, and hyperlinks",
       "version": "1.1.4",
       "author": {
@@ -42,8 +42,8 @@
       "keywords": ["google", "docs", "sheets", "slides", "drive", "spreadsheet", "gmail", "calendar", "tasks", "forms"]
     },
     {
-      "name": "fe-specialized-agents",
-      "source": "./plugins/fe-specialized-agents",
+      "name": "specialized-agents",
+      "source": "./plugins/specialized-agents",
       "description": "Specialized agents for web dev testing and diagram generation",
       "version": "1.0.0",
       "author": {
@@ -53,8 +53,8 @@
       "keywords": ["agents", "cli", "diagrams", "testing"]
     },
     {
-      "name": "fe-vibe-setup",
-      "source": "./plugins/fe-vibe-setup",
+      "name": "vibe-setup",
+      "source": "./plugins/vibe-setup",
       "description": "Setup, configuration, and validation for the vibe environment",
       "version": "1.0.0",
       "author": {
@@ -64,8 +64,8 @@
       "keywords": ["setup", "configuration", "validation"]
     },
     {
-      "name": "fe-mcp-servers",
-      "source": "./plugins/fe-mcp-servers",
+      "name": "mcp-servers",
+      "source": "./plugins/mcp-servers",
       "description": "Custom MCP servers framework (future-ready)",
       "version": "1.0.0",
       "author": {
@@ -75,8 +75,8 @@
       "keywords": ["mcp", "servers"]
     },
     {
-      "name": "fe-shared-resources",
-      "source": "./plugins/fe-shared-resources",
+      "name": "shared-resources",
+      "source": "./plugins/shared-resources",
       "description": "Shared resource files (Python utilities, configs) used by multiple plugins",
       "version": "1.0.0",
       "author": {
@@ -86,8 +86,8 @@
       "keywords": ["shared", "resources", "utilities"]
     },
     {
-      "name": "fe-jira-tools",
-      "source": "./plugins/fe-jira-tools",
+      "name": "jira-tools",
+      "source": "./plugins/jira-tools",
       "description": "JIRA ticket operations: search, view, comment, and create tickets (configurable for any JIRA instance)",
       "version": "1.0.0",
       "author": {
@@ -97,8 +97,8 @@
       "keywords": ["jira", "tickets", "atlassian"]
     },
     {
-      "name": "fe-workflows",
-      "source": "./plugins/fe-workflows",
+      "name": "workflows",
+      "source": "./plugins/workflows",
       "description": "Workflows for sizing, documentation, security, support, troubleshooting, competitive analysis, architecture diagrams, and more",
       "version": "1.0.0",
       "author": {
@@ -119,8 +119,8 @@
       ]
     },
     {
-      "name": "fe-macos-scheduler",
-      "source": "./plugins/fe-macos-scheduler",
+      "name": "macos-scheduler",
+      "source": "./plugins/macos-scheduler",
       "description": "Schedule and manage recurring local macOS launchd tasks. Create tasks that run Claude prompts on intervals, calendar schedules, or file-change watchers.",
       "version": "1.0.4",
       "author": {

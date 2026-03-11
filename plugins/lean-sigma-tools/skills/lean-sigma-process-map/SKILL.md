@@ -356,7 +356,7 @@ cat > /tmp/process_map_doc.md << 'EOF'
 
 EOF
 
-python3 ~/.claude/plugins/cache/fe-vibe/fe-google-tools/*/skills/google-docs/resources/markdown_to_gdocs.py \
+python3 ~/.claude/plugins/cache/claude-vibe/google-tools/*/skills/google-docs/resources/markdown_to_gdocs.py \
   --input /tmp/process_map_doc.md \
   --title "Process Map — [Process Name] — [Customer] — [Date]"
 ```

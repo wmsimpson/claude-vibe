@@ -1,0 +1,12 @@
+{
+  "name": "app-dev",
+  "version": "1.0.0",
+  "description": "Mobile and web app development workflows — scaffolding, GitHub integration, deployment, and debugging for personal projects",
+  "author": { "name": "Will Simpson" },
+  "skills": [
+    "./skills/app-setup",
+    "./skills/github-workflow",
+    "./skills/web-deployment",
+    "./skills/app-debug"
+  ]
+}

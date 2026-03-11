@@ -65,16 +65,20 @@ step_install_tools() {
     fi
   fi
 
-  # ── Databricks CLI ─────────────────────────────────────────────────────
-  if command -v databricks &>/dev/null; then
-    print_success "Databricks CLI"
-  else
-    print_step "Installing Databricks CLI..."
-    if run_with_spinner "brew install databricks..." brew install databricks; then
-      print_success "Databricks CLI installed"
+  # ── Databricks CLI (optional) ──────────────────────────────────────────
+  if is_databricks_enabled; then
+    if command -v databricks &>/dev/null; then
+      print_success "Databricks CLI"
     else
-      print_warn "Databricks CLI not installed — Databricks features will be limited"
+      print_step "Installing Databricks CLI..."
+      if run_with_spinner "brew install databricks..." brew install databricks; then
+        print_success "Databricks CLI installed"
+      else
+        print_warn "Databricks CLI not installed — Databricks features will be limited"
+      fi
     fi
+  else
+    print_info "Databricks CLI — ${DIM}skipped (not enabled)${NC}"
   fi
 
   # ── Configure ~/.zprofile ──────────────────────────────────────────────

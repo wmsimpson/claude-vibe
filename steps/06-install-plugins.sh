@@ -7,18 +7,17 @@ step_install_plugins() {
   print_info "Installing plugin collections from claude-vibe."
   print_blank
 
-  # All plugins available in this repo
+  # Core plugins (always available)
   local all_plugins=(
-    "fe-google-tools"
-    "fe-app-dev"
-    "fe-workflows"
-    "fe-vibe-setup"
-    "fe-specialized-agents"
-    "fe-macos-scheduler"
+    "google-tools"
+    "app-dev"
+    "workflows"
+    "vibe-setup"
+    "specialized-agents"
+    "macos-scheduler"
     "lean-sigma-tools"
-    "fe-jira-tools"
-    "fe-databricks-tools"
-    "fe-mcp-servers"
+    "jira-tools"
+    "mcp-servers"
   )
 
   local descriptions=(
@@ -30,9 +29,14 @@ step_install_plugins() {
     "macOS Scheduler (launchd background tasks)"
     "Lean Six Sigma (FMEA, SIPOC, Process Maps)"
     "JIRA (Search, create, update tickets)"
-    "Databricks Tools (Query, deploy, manage workspaces)"
     "MCP Server Configs"
   )
+
+  # Add Databricks plugin if enabled
+  if is_databricks_enabled; then
+    all_plugins+=("databricks-tools")
+    descriptions+=("Databricks Tools (Query, deploy, manage workspaces)")
+  fi
 
   print_info "Available plugins:"
   print_blank

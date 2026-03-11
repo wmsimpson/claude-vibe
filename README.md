@@ -13,13 +13,15 @@ One command gets you:
 
 ## Quick Start
 
+Make sure [Homebrew](https://brew.sh) is installed first, then:
+
 ```bash
 git clone https://github.com/wmsimpson/claude-vibe.git
 cd claude-vibe
 ./setup.sh
 ```
 
-This installs the `vibe` command and launches the interactive installer. From then on, use `vibe` directly from anywhere.
+This installs the `vibe` command and launches the interactive installer. You'll be prompted about optional integrations (Databricks, Slack, etc.) so only the tools you need get installed. From then on, use `vibe` directly from anywhere.
 
 ## Usage
 
@@ -50,8 +52,8 @@ vibe profile delete work      # Delete a profile
 | 1 | Install Claude Code (AVX detection, npm/Homebrew) | 1 min |
 | 2 | Google OAuth client setup (browser-guided) | 3 min |
 | 3 | Enable Google APIs and set quota project | 1 min |
-| 4 | Install dev tools (go, jq, yq, rg, node, gh, mmdc, graphviz) | 2 min |
-| 5 | Install Databricks AI Dev Kit (50+ MCP tools, 34 skills) | 3 min |
+| 4 | Install dev tools (go, jq, yq, rg, node, gh, mmdc, graphviz, gcloud) | 2 min |
+| 5 | Install Databricks AI Dev Kit *(optional — skipped if Databricks not enabled)* | 3 min |
 | 6 | Install Claude Code plugins from bundled collection | 1 min |
 | 7 | Configure MCP integrations (GitHub, Chrome DevTools, optional others) | 2 min |
 | 8 | Run full validation suite | 30 sec |
@@ -62,26 +64,70 @@ All plugins ship with this repo — no external repos or git clones required.
 
 | Plugin | Description |
 |--------|-------------|
-| `fe-google-tools` | Gmail, Docs, Sheets, Slides, Calendar, Forms, Tasks |
-| `fe-app-dev` | React Native, Expo, Next.js, Swift, Flutter — scaffold, deploy, debug |
-| `fe-workflows` | Architecture diagrams, RCA, POC docs, security questionnaires, sizing |
-| `fe-vibe-setup` | Environment setup, validation, usage stats, integrations |
-| `fe-specialized-agents` | Lucid Chart diagrams, Graphviz, web dev testing |
-| `fe-databricks-tools` | Databricks queries, deployments, workspace management, demos |
-| `fe-jira-tools` | Search, create, view, comment on JIRA tickets |
-| `fe-macos-scheduler` | Schedule recurring launchd tasks on macOS |
+| `google-tools` | Gmail, Docs, Sheets, Slides, Calendar, Forms, Tasks |
+| `app-dev` | React Native, Expo, Next.js, Swift, Flutter — scaffold, deploy, debug |
+| `workflows` | Architecture diagrams, RCA, POC docs, security questionnaires, sizing |
+| `vibe-setup` | Environment setup, validation, usage stats, integrations |
+| `specialized-agents` | Lucid Chart diagrams, Graphviz, web dev testing |
+| `databricks-tools` | Databricks queries, deployments, workspace management, demos |
+| `jira-tools` | Search, create, view, comment on JIRA tickets |
+| `macos-scheduler` | Schedule recurring launchd tasks on macOS |
 | `lean-sigma-tools` | FMEA risk tables, SIPOC diagrams, swimlane process maps |
-| `fe-mcp-servers` | MCP server framework (future-ready) |
-| `fe-shared-resources` | Shared Python utilities and configs across plugins |
+| `mcp-servers` | MCP server framework (future-ready) |
+| `shared-resources` | Shared Python utilities and configs across plugins |
 
 During setup, you can install all plugins or select specific ones interactively.
 
 ## Prerequisites
 
-- **macOS** (Intel or Apple Silicon)
-- **Claude subscription** (Pro $20/mo, Max $100/mo recommended)
-- **Google account** (for Workspace APIs — free)
-- **Homebrew** (installed automatically if missing)
+Before running `./setup.sh`, make sure you have the following:
+
+### Required
+
+| Prerequisite | Why | Install |
+|---|---|---|
+| **macOS** (Intel or Apple Silicon) | This tool is macOS-only (uses Homebrew, launchd, zsh) | — |
+| **Homebrew** | Installs all CLI tools (node, go, jq, gcloud, etc.) | `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"` |
+| **Git** | Clone the repo; also used by GitHub MCP integration | `brew install git` (or Xcode CLT: `xcode-select --install`) |
+| **Claude subscription** | Claude Code requires an active Anthropic plan | [claude.ai/pricing](https://claude.ai/pricing) — Pro ($20/mo) or Max ($100/mo recommended) |
+
+### Recommended (installed automatically during setup if missing)
+
+These are installed by Step 4, but having them ahead of time speeds things up:
+
+| Tool | Purpose |
+|---|---|
+| **Node.js** | Required for Claude Code (npm install) and mermaid-cli |
+| **Python 3** | Used by setup scripts for JSON/YAML processing and plugin permissions sync |
+| **Google Cloud SDK (`gcloud`)** | Google OAuth and API access — `brew install --cask google-cloud-sdk` |
+
+### Optional accounts (prompted during setup)
+
+| Account | What it enables |
+|---|---|
+| **Google account** (free) | Gmail, Docs, Sheets, Slides, Calendar, Forms, Tasks APIs |
+| **GitHub account** | GitHub MCP integration — repo management, PRs, issues |
+| **Databricks workspace** | Databricks CLI, AI Dev Kit, query/deploy tools (prompted — skipped if not needed) |
+| **JIRA instance** | Ticket search, creation, and management |
+| **Slack workspace** | Slack MCP integration (optional in Step 7) |
+
+### Verify prerequisites
+
+```bash
+# Check that Homebrew is installed
+brew --version
+
+# Check git
+git --version
+
+# (Optional) Check Python 3
+python3 --version
+```
+
+If Homebrew is not installed, run:
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
 
 ## After Setup
 
@@ -141,17 +187,17 @@ claude-vibe/
     07-configure-mcp.sh
     08-validate.sh
   plugins/                Bundled plugin collections
-    fe-google-tools/      Google Workspace skills + agents
-    fe-app-dev/           App development skills
-    fe-workflows/         Workflow automation skills + agents
-    fe-vibe-setup/        Setup and diagnostics skills + agents
-    fe-specialized-agents/  Diagram and testing agents
-    fe-databricks-tools/  Databricks integration skills + agents
-    fe-jira-tools/        JIRA skills + agents
-    fe-macos-scheduler/   macOS scheduler skills
+    google-tools/      Google Workspace skills + agents
+    app-dev/           App development skills
+    workflows/         Workflow automation skills + agents
+    vibe-setup/        Setup and diagnostics skills + agents
+    specialized-agents/  Diagram and testing agents
+    databricks-tools/  Databricks integration skills + agents
+    jira-tools/        JIRA skills + agents
+    macos-scheduler/   macOS scheduler skills
     lean-sigma-tools/     Lean Six Sigma skills
-    fe-mcp-servers/       MCP server framework
-    fe-shared-resources/  Shared utilities
+    mcp-servers/       MCP server framework
+    shared-resources/  Shared utilities
   .claude-plugin/         Plugin manifests (plugin.json, marketplace.json)
   permissions.yaml        Master skill permissions config
   mcp-servers.yaml        MCP server configs

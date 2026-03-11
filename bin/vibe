@@ -159,6 +159,37 @@ find_resume_point() {
   echo 1
 }
 
+# ── Databricks preference ──────────────────────────────────────────────────
+
+_prompt_databricks_preference() {
+  # Skip if already set
+  local current
+  current="$(get_state_flag databricks_enabled "")"
+  if [[ "$current" == "true" || "$current" == "false" ]]; then
+    if is_databricks_enabled; then
+      print_info "Databricks integration: ${GREEN}enabled${NC}"
+    else
+      print_info "Databricks integration: ${DIM}skipped${NC}"
+    fi
+    return
+  fi
+
+  print_blank
+  print_info "Some setup steps are specific to ${BOLD}Databricks${NC} users:"
+  print_info "  • Databricks CLI install"
+  print_info "  • Databricks AI Dev Kit (MCP tools & skills)"
+  print_info "  • Databricks plugin collection"
+  print_blank
+  if ask_yes_no "Do you use Databricks?" "n"; then
+    set_state_flag "databricks_enabled" "true"
+    print_success "Databricks steps will be included"
+  else
+    set_state_flag "databricks_enabled" "false"
+    print_info "Databricks steps will be skipped (you can enable later with 'vibe install --step 5')"
+  fi
+  print_blank
+}
+
 # ── Commands ────────────────────────────────────────────────────────────────
 
 cmd_install() {
@@ -193,6 +224,8 @@ cmd_install() {
       show_banner
       show_overview
       if ask_yes_no "Start full setup?" "y"; then
+        # Ask about Databricks early so steps can check the flag
+        _prompt_databricks_preference
         run_all
       else
         print_info "Run 'vibe help' for options"
