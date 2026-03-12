@@ -139,6 +139,17 @@
       },
       "category": "productivity",
       "keywords": ["lean", "six-sigma", "SIPOC", "FMEA", "process-map", "dmaic", "risk"]
+    },
+    {
+      "name": "superpowers",
+      "source": "external:claude-plugins-official",
+      "description": "Agentic skills framework for structured software development — TDD, deliberate planning, subagent-driven development, systematic debugging, code review, and git worktree management",
+      "version": "5.0.2",
+      "author": {
+        "name": "Jesse Vincent"
+      },
+      "category": "development",
+      "keywords": ["tdd", "planning", "subagent", "code-review", "debugging", "git-worktree", "methodology", "skills-framework"]
     }
   ]
 }

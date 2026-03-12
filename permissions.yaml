@@ -114,6 +114,22 @@ allow:
   - "Skill(lean-sigma-process-map)"
   - "Skill(lean-sigma-sipoc)"
 
+  # Superpowers (external — structured dev methodology)
+  - "Skill(brainstorming)"
+  - "Skill(dispatching-parallel-agents)"
+  - "Skill(executing-plans)"
+  - "Skill(finishing-a-development-branch)"
+  - "Skill(receiving-code-review)"
+  - "Skill(requesting-code-review)"
+  - "Skill(subagent-driven-development)"
+  - "Skill(systematic-debugging)"
+  - "Skill(test-driven-development)"
+  - "Skill(using-git-worktrees)"
+  - "Skill(using-superpowers)"
+  - "Skill(verification-before-completion)"
+  - "Skill(writing-plans)"
+  - "Skill(writing-skills)"
+
   # ---------------------------------------------------------------
   # DISABLED SKILLS (Databricks-internal dependencies)
   # Moved to plugins/_disabled/ — kept for future reference

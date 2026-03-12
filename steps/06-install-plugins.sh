@@ -38,38 +38,83 @@ step_install_plugins() {
     descriptions+=("Databricks Tools (Query, deploy, manage workspaces)")
   fi
 
+  # External plugins (installed from official marketplace)
+  local external_plugins=(
+    "superpowers"
+  )
+
+  local external_descriptions=(
+    "Superpowers (TDD, structured planning, subagent dev, code review, systematic debugging)"
+  )
+
+  local external_sources=(
+    "claude-plugins-official"
+  )
+
   print_info "Available plugins:"
   print_blank
+  print_info "  Bundled (from claude-vibe):"
   for i in "${!all_plugins[@]}"; do
     echo -e "    ${CYAN}${all_plugins[$i]}${NC} — ${DIM}${descriptions[$i]}${NC}"
   done
   print_blank
+  print_info "  External (from official marketplace):"
+  for i in "${!external_plugins[@]}"; do
+    echo -e "    ${CYAN}${external_plugins[$i]}${NC} — ${DIM}${external_descriptions[$i]}${NC}"
+  done
+  print_blank
+
+  # Combine all plugin names for selection
+  local combined_plugins=("${all_plugins[@]}" "${external_plugins[@]}")
+  local combined_descriptions=("${descriptions[@]}" "${external_descriptions[@]}")
 
   local selected_plugins=()
   if ask_yes_no "Install all plugins?" "y"; then
-    selected_plugins=("${all_plugins[@]}")
+    selected_plugins=("${combined_plugins[@]}")
   else
-    ask_multi_select "Select plugins to install:" "${all_plugins[@]}"
+    ask_multi_select "Select plugins to install:" "${combined_plugins[@]}"
     for idx in "${SELECTED_INDICES[@]}"; do
-      selected_plugins+=("${all_plugins[$idx]}")
+      selected_plugins+=("${combined_plugins[$idx]}")
     done
   fi
 
-  # Install selected plugins from this repo
+  # Install selected plugins
   print_blank
   local installed=0
   for plugin in "${selected_plugins[@]}"; do
     print_step "Installing $plugin..."
-    if claude plugin install "${plugin}@claude-vibe" &>/dev/null; then
-      print_success "$plugin"
-      ((installed++))
-    else
-      # Fallback: install from local path directly
-      if claude plugin install "${plugin}@${VIBE_HOME}" &>/dev/null; then
-        print_success "$plugin (local)"
+
+    # Check if this is an external plugin
+    local is_external=false
+    local ext_source=""
+    for i in "${!external_plugins[@]}"; do
+      if [[ "${external_plugins[$i]}" == "$plugin" ]]; then
+        is_external=true
+        ext_source="${external_sources[$i]}"
+        break
+      fi
+    done
+
+    if $is_external; then
+      # Install from official marketplace
+      if claude plugin install "${plugin}@${ext_source}" &>/dev/null; then
+        print_success "$plugin (external)"
         ((installed++))
       else
         print_error "$plugin — install failed"
+      fi
+    else
+      # Install from this repo
+      if claude plugin install "${plugin}@claude-vibe" &>/dev/null; then
+        print_success "$plugin"
+        ((installed++))
+      else
+        if claude plugin install "${plugin}@${VIBE_HOME}" &>/dev/null; then
+          print_success "$plugin (local)"
+          ((installed++))
+        else
+          print_error "$plugin — install failed"
+        fi
       fi
     fi
   done
