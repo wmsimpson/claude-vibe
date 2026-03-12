@@ -120,5 +120,89 @@ print(f'{len(merged)} total, {skill_count} skills')
     print_warn "permissions.yaml not found at $perms_file"
   fi
 
+  # Install security guard hooks
+  print_blank
+  print_step "Installing security guard hooks..."
+
+  local hooks_dir="$HOME/.claude/hooks"
+  mkdir -p "$hooks_dir"
+
+  local hooks_src="$VIBE_HOME/hooks"
+  local hooks_installed=0
+
+  for hook_file in "$hooks_src"/guard-*.sh; do
+    if [[ -f "$hook_file" ]]; then
+      local hook_name
+      hook_name=$(basename "$hook_file")
+      cp "$hook_file" "$hooks_dir/$hook_name"
+      chmod +x "$hooks_dir/$hook_name"
+      ((hooks_installed++))
+    fi
+  done
+
+  if [[ $hooks_installed -gt 0 ]]; then
+    # Register hooks in settings.json
+    python3 -c "
+import json, os
+
+settings_path = os.path.expanduser('~/.claude/settings.json')
+if os.path.exists(settings_path):
+    with open(settings_path) as f:
+        settings = json.load(f)
+else:
+    settings = {}
+
+hooks = settings.setdefault('hooks', {})
+pre_tool_use = hooks.get('PreToolUse', [])
+
+# Define guard hooks
+guard_hooks = [
+    {
+        'matcher': 'Bash',
+        'hooks': [{
+            'type': 'command',
+            'command': '~/.claude/hooks/guard-bash.sh',
+            'timeout': 5
+        }]
+    },
+    {
+        'matcher': 'Edit|Write',
+        'hooks': [{
+            'type': 'command',
+            'command': '~/.claude/hooks/guard-files.sh',
+            'timeout': 5
+        }]
+    }
+]
+
+# Add guards if not already present (check by command path)
+existing_commands = set()
+for entry in pre_tool_use:
+    for h in entry.get('hooks', []):
+        existing_commands.add(h.get('command', ''))
+
+for guard in guard_hooks:
+    cmd = guard['hooks'][0]['command']
+    if cmd not in existing_commands:
+        pre_tool_use.append(guard)
+
+hooks['PreToolUse'] = pre_tool_use
+settings['hooks'] = hooks
+
+with open(settings_path, 'w') as f:
+    json.dump(settings, f, indent=2)
+
+print(f'{len(pre_tool_use)} PreToolUse hooks active')
+" 2>/dev/null
+
+    if [[ $? -eq 0 ]]; then
+      print_success "$hooks_installed security hooks installed"
+    else
+      print_error "Hook registration failed"
+    fi
+  else
+    print_warn "No guard hooks found in $hooks_src"
+  fi
+
   mark_step_complete "install_plugins"
 }
