@@ -125,7 +125,7 @@ Based on the legacy installer and CLI doctor command:
 |-------|-------------|---------------|
 | `prereqs` | gh, jq, yq, claude installed | Print install instructions |
 | `marketplace` | ~/.vibe/marketplace exists | Run `vibe update` |
-| `marketplace_registered` | fe-vibe registered with claude | `claude plugin marketplace add` |
+| `marketplace_registered` | vibe registered with claude | `claude plugin marketplace add` |
 | `settings_json` | ~/.claude/settings.json valid | Create default or fix JSON |
 | `permissions` | Required permissions present | Sync from marketplace |
 | `mcp_config` | ~/.config/mcp/config.json valid | Create/fix |
@@ -197,7 +197,7 @@ Manage MCP servers with enable/disable toggles.
 
 ##### Plugins Tab
 
-Manage plugins from the individual-vibe-tool marketplace.
+Manage plugins from the claude-vibe marketplace.
 
 **Data Sources**:
 - `~/.vibe/marketplace/.claude-plugin/marketplace.json` (available)
@@ -263,9 +263,9 @@ Test local plugin changes without manual marketplace management steps.
 #### Behavior
 
 1. Walk up from the current directory to find the vibe repository root (looks for `.claude-plugin/marketplace.json`)
-2. Remove the existing `individual-vibe-tool` marketplace registration
-3. Re-register the local repo root as the `individual-vibe-tool` marketplace source
-4. For each plugin name provided, run `claude plugin install <name>@individual-vibe-tool`
+2. Remove the existing `claude-vibe` marketplace registration
+3. Re-register the local repo root as the `claude-vibe` marketplace source
+4. For each plugin name provided, run `claude plugin install <name>@claude-vibe`
 5. Launch an agent session (unless `--no-agent` is set)
 
 #### Flags
@@ -276,9 +276,9 @@ Test local plugin changes without manual marketplace management steps.
 
 ```bash
 cd ~/code/vibe
-vibe local fe-databricks-tools           # Install one plugin and launch agent
-vibe local fe-databricks-tools fe-google-tools  # Install multiple plugins
-vibe local fe-databricks-tools --no-agent       # Install without launching agent
+vibe local databricks-tools           # Install one plugin and launch agent
+vibe local databricks-tools google-tools  # Install multiple plugins
+vibe local databricks-tools --no-agent       # Install without launching agent
 ```
 
 ### 6. `vibe agent [name]`
@@ -384,8 +384,8 @@ version: 1
 name: my-profile
 description: "Custom profile for ML projects"
 plugins:
-  - fe-databricks-tools
-  - fe-internal-tools
+  - databricks-tools
+  - internal-tools
 mcp_servers:
   chrome-devtools:
     enabled: true

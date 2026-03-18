@@ -254,8 +254,8 @@ Run `vibe doctor` for automated diagnostics.
 **Plugins not loading after install**
 - Restart Claude Code — plugins load at startup
 
-**Plugin cache shows `individual-vibe-tool`**
-- Old installs cached under the previous name. Run `vibe install --step 6` to reinstall under `claude-vibe`
+**Plugin cache shows old name**
+- Old installs may be cached under a previous name. Run `vibe install --step 6` to reinstall under `claude-vibe`
 
 ## License
 
