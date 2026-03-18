@@ -283,6 +283,12 @@ func (p *Profile) ApplyWithOptions(dir string, opts ApplyOptions) (*ApplyResult,
 		}
 	}
 
+	// Sync env file if available
+	if err := p.SyncEnvFile(); err != nil {
+		result.Warnings = append(result.Warnings,
+			fmt.Sprintf("Failed to sync env file: %v", err))
+	}
+
 	return result, nil
 }
 

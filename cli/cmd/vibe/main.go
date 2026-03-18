@@ -1630,6 +1630,12 @@ var profileCurrentCmd = &cobra.Command{
 		if p.DatabricksProfile != "" {
 			fmt.Printf("Databricks:     %s\n", p.DatabricksProfile)
 		}
+		if p.Email != "" {
+			fmt.Printf("Email:          %s\n", p.Email)
+		}
+		if p.GitEmail != "" {
+			fmt.Printf("Git email:      %s\n", p.GitEmail)
+		}
 		fmt.Printf("Plugins:        %d\n", len(p.Plugins))
 		enabledMCP := 0
 		for _, v := range p.MCPServers {
@@ -1699,6 +1705,18 @@ synced to ~/.mcp.json and ~/.vibe/env immediately.`,
 
 		if p.Description != "" {
 			fmt.Printf("  Description: %s\n", p.Description)
+		}
+
+		// Sync env file
+		if err := p.SyncEnvFile(); err != nil {
+			fmt.Fprintf(os.Stderr, "  Warning: failed to sync env file: %v\n", err)
+		} else if p.EnvFile != "" {
+			fmt.Printf("  Env file: %s (synced)\n", p.EnvFile)
+		}
+
+		// Show identity
+		if p.Email != "" {
+			fmt.Printf("  Email: %s\n", p.Email)
 		}
 
 		if p.DatabricksProfile != "" {
