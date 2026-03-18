@@ -23,6 +23,22 @@ cd claude-vibe
 
 This installs the `vibe` command and launches the interactive installer. You'll be prompted about optional integrations (Databricks, Slack, etc.) so only the tools you need get installed. From then on, use `vibe` directly from anywhere.
 
+## Building the Go CLI (optional)
+
+The Go CLI provides a richer experience with an interactive TUI, doctor diagnostics,
+and profile management. The shell-based `vibe` command works without it, but the
+Go CLI adds:
+- Interactive TUI for configuration (`vibe configure`)
+- Health checks with auto-repair (`vibe doctor`)
+- Self-updating (`vibe update`)
+
+```bash
+cd claude-vibe/cli
+go build -o ~/.local/bin/vibe ./cmd/vibe/
+```
+
+Requires [Go 1.24+](https://go.dev/dl/).
+
 ## Usage
 
 ```bash
