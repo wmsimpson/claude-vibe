@@ -1005,3 +1005,113 @@ func TestValidateProfileName(t *testing.T) {
 		})
 	}
 }
+
+func TestLoadProfile_WithIdentityFields(t *testing.T) {
+	tempDir := t.TempDir()
+	profilesDir := filepath.Join(tempDir, ".vibe", "profiles")
+	os.MkdirAll(profilesDir, 0755)
+
+	profileContent := `version: 1
+name: identity-test
+description: "Profile with identity"
+email: user@example.com
+git_email: user@example.com
+env_file: identity-test.env
+integrations:
+  github: true
+  slack: false
+databricks_profile: DEFAULT
+`
+	os.WriteFile(filepath.Join(profilesDir, "identity-test.yaml"), []byte(profileContent), 0644)
+
+	originalHome := os.Getenv("HOME")
+	os.Setenv("HOME", tempDir)
+	defer os.Setenv("HOME", originalHome)
+
+	profile, err := LoadProfile("identity-test")
+	if err != nil {
+		t.Fatalf("LoadProfile() error: %v", err)
+	}
+
+	if profile.Email != "user@example.com" {
+		t.Errorf("expected email 'user@example.com', got %s", profile.Email)
+	}
+	if profile.GitEmail != "user@example.com" {
+		t.Errorf("expected git_email 'user@example.com', got %s", profile.GitEmail)
+	}
+	if profile.EnvFile != "identity-test.env" {
+		t.Errorf("expected env_file 'identity-test.env', got %s", profile.EnvFile)
+	}
+	if !profile.Integrations["github"] {
+		t.Error("expected github integration to be true")
+	}
+	if profile.Integrations["slack"] {
+		t.Error("expected slack integration to be false")
+	}
+}
+
+func TestProfile_SyncEnvFile(t *testing.T) {
+	tempDir := t.TempDir()
+	originalHome := os.Getenv("HOME")
+	os.Setenv("HOME", tempDir)
+	defer os.Setenv("HOME", originalHome)
+
+	profilesDir := filepath.Join(tempDir, ".vibe", "profiles")
+	os.MkdirAll(profilesDir, 0755)
+	os.MkdirAll(filepath.Join(tempDir, ".vibe"), 0755)
+
+	envContent := "# env for test\nexport FOO=bar\n"
+	os.WriteFile(filepath.Join(profilesDir, "test-profile.env"), []byte(envContent), 0644)
+
+	profile := &Profile{Name: "test-profile", EnvFile: "test-profile.env"}
+	err := profile.SyncEnvFile()
+	if err != nil {
+		t.Fatalf("SyncEnvFile() error: %v", err)
+	}
+
+	data, err := os.ReadFile(filepath.Join(tempDir, ".vibe", "env"))
+	if err != nil {
+		t.Fatalf("Failed to read ~/.vibe/env: %v", err)
+	}
+	if string(data) != envContent {
+		t.Errorf("expected %q, got %q", envContent, string(data))
+	}
+}
+
+func TestProfile_SyncEnvFile_NoEnvFile(t *testing.T) {
+	tempDir := t.TempDir()
+	originalHome := os.Getenv("HOME")
+	os.Setenv("HOME", tempDir)
+	defer os.Setenv("HOME", originalHome)
+
+	profile := &Profile{Name: "no-env"}
+	err := profile.SyncEnvFile()
+	if err != nil {
+		t.Fatalf("SyncEnvFile() should be no-op, got: %v", err)
+	}
+}
+
+func TestProfile_SyncEnvFile_FallbackToNamedEnv(t *testing.T) {
+	tempDir := t.TempDir()
+	originalHome := os.Getenv("HOME")
+	os.Setenv("HOME", tempDir)
+	defer os.Setenv("HOME", originalHome)
+
+	profilesDir := filepath.Join(tempDir, ".vibe", "profiles")
+	os.MkdirAll(profilesDir, 0755)
+	os.MkdirAll(filepath.Join(tempDir, ".vibe"), 0755)
+
+	envContent := "# fallback\nexport BAZ=qux\n"
+	os.WriteFile(filepath.Join(profilesDir, "fb-profile.env"), []byte(envContent), 0644)
+
+	profile := &Profile{Name: "fb-profile"}
+	err := profile.SyncEnvFile()
+	if err != nil {
+		t.Fatalf("SyncEnvFile() error: %v", err)
+	}
+
+	data, _ := os.ReadFile(filepath.Join(tempDir, ".vibe", "env"))
+	if string(data) != envContent {
+		t.Errorf("expected fallback content, got %q", string(data))
+	}
+}

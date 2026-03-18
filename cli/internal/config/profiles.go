@@ -17,6 +17,10 @@ type Profile struct {
 	Version            int               `yaml:"version"`
 	Name               string            `yaml:"name"`
 	Description        string            `yaml:"description,omitempty"`
+	Email              string            `yaml:"email,omitempty"`
+	GitEmail           string            `yaml:"git_email,omitempty"`
+	EnvFile            string            `yaml:"env_file,omitempty"`
+	Integrations       map[string]bool   `yaml:"integrations,omitempty"`
 	Plugins            []string          `yaml:"plugins,omitempty"`
 	MCPServers         map[string]bool   `yaml:"mcp_servers,omitempty"`
 	Permissions        PermissionSet     `yaml:"permissions,omitempty"`
@@ -85,6 +89,9 @@ func LoadProfile(name string) (*Profile, error) {
 	}
 	if profile.Permissions.Deny == nil {
 		profile.Permissions.Deny = []string{}
+	}
+	if profile.Integrations == nil {
+		profile.Integrations = make(map[string]bool)
 	}
 
 	return profile, nil
@@ -484,6 +491,40 @@ func (p *Profile) writeProjectSettings(claudeDir string) error {
 	}
 
 	return os.WriteFile(settingsPath, data, 0644)
+}
+
+// SyncEnvFile copies the profile's env file to ~/.vibe/env.
+// Uses EnvFile field if set, otherwise falls back to <name>.env.
+// No-op if neither exists.
+func (p *Profile) SyncEnvFile() error {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+
+	profilesDir := filepath.Join(home, ".vibe", "profiles")
+	targetPath := filepath.Join(home, ".vibe", "env")
+
+	var sourcePath string
+	if p.EnvFile != "" {
+		sourcePath = filepath.Join(profilesDir, p.EnvFile)
+	} else {
+		candidate := filepath.Join(profilesDir, p.Name+".env")
+		if _, err := os.Stat(candidate); err == nil {
+			sourcePath = candidate
+		}
+	}
+
+	if sourcePath == "" {
+		return nil
+	}
+
+	data, err := os.ReadFile(sourcePath)
+	if err != nil {
+		return fmt.Errorf("reading profile env file %s: %w", sourcePath, err)
+	}
+
+	return os.WriteFile(targetPath, data, 0644)
 }
 
 // writeProjectClaudeJSON writes MCP servers to .claude.json
