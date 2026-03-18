@@ -391,7 +391,70 @@ If yes: spawn the `vibe-profile` agent. It gathers your name, GitHub username, a
 
 ---
 
-## Step 13 — Usage Tracking and Budget
+## Step 13 — Profiles
+
+Profiles let you switch between identities and workspaces (e.g., personal vs. work). Each profile stores its own env file with integration tokens, Databricks workspace, and identity.
+
+Check for existing profiles:
+```bash
+ls ~/.vibe/profiles/*.yaml 2>/dev/null && echo "Profiles exist" || echo "No profiles yet"
+```
+
+If no profiles exist, create a default one:
+
+### 13a. Ask for profile details
+
+Ask: *"What should your default profile be called? (e.g., 'personal', 'work')"*
+
+Then ask for:
+- **Email** for this profile
+- **Git email** (if different from email)
+- **Databricks profile name** (from `databricks auth profiles`, or leave blank)
+
+### 13b. Create the profile YAML
+
+```bash
+cat > ~/.vibe/profiles/<name>.yaml << EOF
+version: 1
+name: <name>
+description: <user-provided description>
+email: <email>
+git_email: <git_email>
+databricks_profile: <databricks_profile or omit>
+env_file: <name>.env
+integrations:
+  github: false
+  slack: false
+EOF
+```
+
+### 13c. Create the profile env file
+
+Copy the current `~/.vibe/env` as the starting point:
+```bash
+cp ~/.vibe/env ~/.vibe/profiles/<name>.env
+# Update the header comment
+sed -i '' "1s|.*|# ~/.vibe/env for profile: <name> (<email>)|" ~/.vibe/profiles/<name>.env
+```
+
+### 13d. Set as active profile
+
+```bash
+echo "<name>" > ~/.vibe/active-profile
+```
+
+### 13e. Additional profiles
+
+Ask: *"Do you have another workspace or identity? (e.g., a work profile)"*
+
+If yes, repeat 13a-13d.
+
+Tell the user:
+> *"Switch profiles with `vibe profile switch <name>`. This swaps your env vars, Databricks workspace, and identity."*
+
+---
+
+## Step 14 — Usage Tracking and Budget
 
 Install the usage tracker and configure a monthly budget. This logs every session's
 cost to `~/.vibe/usage.json` and warns you when approaching your limit.
@@ -435,7 +498,7 @@ Tell the user:
 
 ---
 
-## Step 14 — Optional Integrations
+## Step 15 — Optional Integrations
 
 Ask the user: *"Would you like to connect any additional services? All options are free-tier or open source."*
 
@@ -454,7 +517,7 @@ The skill will guide through account creation and token setup for each selected 
 
 ---
 
-## Step 15 — Final Verification
+## Step 16 — Final Verification
 
 Run the `validate-mcp-access` skill to do a live check of all configured tools and connections. It will:
 - Open Chrome via chrome-devtools MCP and take a screenshot to confirm visual debugging works
