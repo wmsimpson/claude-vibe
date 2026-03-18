@@ -1,0 +1,14 @@
+name: "Skill Quality Tests"
+description: "LLM-as-judge quality evaluations for skill output"
+
+tests:
+  - name: "logfood-consumption-returns-data"
+    prompt: "What is the T30D DBU consumption for the Databricks account?"
+    expected_skill: "fe-internal-tools:logfood-querier"
+    judge_criteria: |
+      - Response contains a specific numeric DBU value
+      - Response references a time period (T30D, last 30 days, or similar)
+      - Response does not say "I don't have access" or "authentication failed"
+      - Response is formatted as a readable summary, not raw JSON
+    max_turns: 10
+    model: sonnet

@@ -1,0 +1,533 @@
+name: "Skill Routing Tests"
+description: "Verify Claude Code invokes correct skills for various prompts"
+
+tests:
+  - name: "fe-manager-territory-research"
+    prompt: "Run a territory overview and identify big bet accounts for AE John Smith"
+    expected_skill: "manager:ae-territory-big-bet-research"
+    max_turns: 5
+    model: opus
+
+  - name: "fe-manager-biweekly-review"
+    prompt: "Prepare a bi-weekly business review for my AE Jane Doe"
+    expected_skill: "manager:ae-biweekly-review"
+    max_turns: 5
+    model: opus
+
+  - name: "fe-manager-account-signals"
+    prompt: "Show me behavioral signals for account Acme Corp"
+    expected_skill: "manager:ae-accounts-signals"
+    max_turns: 5
+    model: opus
+
+  - name: "workspace-query-uses-fe-vm"
+    prompt: "create a databricks classic workspace"
+    expected_skill: "databricks-tools:databricks-fe-vm-workspace-deployment"
+    max_turns: 5
+    model: opus
+
+  # One-Env Workspace Deployment skill evals
+  - name: "oneenv-workspace-custom-aws"
+    prompt: "I need to create a workspace that has custom IAM roles for S3 cross-account access"
+    expected_skill: "databricks-tools:databricks-oneenv-workspace-deployment"
+    max_turns: 5
+    model: opus
+
+  - name: "oneenv-workspace-classic-vpc"
+    prompt: "I need a classic Databricks workspace with a custom VPC for PrivateLink demo"
+    expected_skill: "databricks-tools:databricks-oneenv-workspace-deployment"
+    max_turns: 5
+    model: opus
+
+  - name: "doc-summary-uses-google-docs"
+    prompt: "Read this document and summarize what's in it: https://docs.google.com/document/d/1GLg_-Ow-a6-d5XDPHGGOxDDrBdq7VStn5ndWoUqtfEs"
+    expected_skill: "google-tools:google-docs"
+    max_turns: 5
+    model: opus
+
+  - name: "salesforce-use-cases-query"
+    prompt: "Which use cases do we have at Instacart in stage 6"
+    expected_skill_one_of:
+      - "salesforce-tools:salesforce-actions"
+      - "salesforce-tools:salesforce-authentication"
+    max_turns: 5
+    model: opus
+
+  - name: "logfood-quota-query"
+    prompt: "query logfood for how much quota Block has used for model serving"
+    expected_skill: "internal-tools:logfood-querier"
+    max_turns: 5
+    model: opus
+
+  - name: "genie-room-query"
+    prompt: "query this genie room 01ef336cd40b11f2b4931415636694eb for top accounts by revenue"
+    expected_skill: "internal-tools:genie-rooms"
+    max_turns: 5
+    model: opus
+
+  - name: "jargon-lookup-dnb"
+    prompt: "what does DNB stand for in Databricks?"
+    expected_skill: "internal-tools:internal-jargon"
+    max_turns: 5
+    model: opus
+
+  - name: "jargon-lookup-in-uco-context"
+    prompt: "how many UCOs does DNB have"
+    expected_skill_one_of:
+      - "salesforce-tools:salesforce-actions"
+      - "internal-tools:internal-jargon"
+    max_turns: 10
+    model: opus
+
+  - name: "configure-vibe-setup"
+    prompt: "configure vibe"
+    expected_skill: "vibe-setup:configure-vibe"
+    max_turns: 5
+    model: opus
+
+  # Example: Multiple skills that must ALL be called (AND logic)
+  # - name: "deploy-app-uses-multiple-skills"
+  #   prompt: "deploy my app to the workspace I created"
+  #   expected_skills:
+  #     - "databricks-tools:databricks-fe-vm-workspace-deployment"
+  #     - "databricks-tools:databricks-apps"
+  #   max_turns: 10
+  #   model: opus
+
+  # Example: Any of these skills (OR logic)
+  # - name: "auth-uses-some-auth-skill"
+  #   prompt: "authenticate with databricks"
+  #   expected_skill_one_of:
+  #     - "databricks-tools:databricks-authentication"
+  #     - "internal-tools:aws-authentication"
+  #   max_turns: 3
+  #   model: haiku
+
+  # FE Search / Product Question Research skill evals
+  - name: "product-question-mv-iceberg"
+    prompt: "Do materialized views on foreign iceberg tables support incrementalization?"
+    expected_skill: "workflows:product-question-research"
+    max_turns: 5
+    model: opus
+
+  - name: "product-question-capability"
+    prompt: "I need to answer a product question for a customer about Unity Catalog feature X, can you research it?"
+    expected_skill: "workflows:product-question-research"
+    max_turns: 5
+    model: opus
+
+  # FE Answer Customer Questions skill evals
+  - name: "answer-customer-questions-from-doc"
+    prompt: "Draft responses to the customer questions in this meeting notes doc: https://docs.google.com/document/d/ABC123"
+    expected_skill: "workflows:fe-answer-customer-questions"
+    max_turns: 5
+    model: opus
+
+  - name: "answer-customer-questions-batch"
+    prompt: "I have a bunch of unanswered customer questions from our sync meeting, can you help draft responses?"
+    expected_skill: "workflows:fe-answer-customer-questions"
+    max_turns: 5
+    model: opus
+
+  # FE Account Transition skill evals
+  - name: "account-transition-document"
+    prompt: "Create an account transition document for Block - Ryan Werth is the new AE"
+    expected_skill: "workflows:fe-account-transition"
+    max_turns: 5
+    model: opus
+
+  - name: "account-handoff"
+    prompt: "I need to hand off the Instacart account to a new SA, can you create a transition doc?"
+    expected_skill: "workflows:fe-account-transition"
+    max_turns: 5
+    model: opus
+
+  # FE Databricks Feature Tester skill evals
+  - name: "feature-tester-simple-feature"
+    prompt: "Test if materialized views support incremental refresh on Delta tables with CDF enabled"
+    expected_skill: "workflows:fe-databricks-feature-tester"
+    max_turns: 5
+    model: opus
+
+  - name: "feature-tester-feature-interaction"
+    prompt: "I need to test whether Lakeflow Connect streaming tables work with UniForm for Iceberg reads"
+    expected_skill: "workflows:fe-databricks-feature-tester"
+    max_turns: 5
+    model: opus
+
+  # Security Questionnaire skill evals
+  - name: "security-questionnaire-basic"
+    prompt: "I need to complete a security questionnaire for a customer"
+    expected_skill: "workflows:security-questionnaire"
+    max_turns: 5
+    model: opus
+
+  - name: "security-questionnaire-access-control"
+    prompt: "Help me answer questions about access control and authentication for a security assessment"
+    expected_skill: "workflows:security-questionnaire"
+    max_turns: 5
+    model: opus
+
+  # Google Calendar availability skill evals
+  - name: "calendar-find-availability"
+    prompt: "Find a time when brandon@databricks.com and sarah@databricks.com are both available next week for a 30-minute meeting"
+    expected_skill: "google-tools:google-calendar"
+    max_turns: 5
+    model: opus
+
+  - name: "calendar-group-scheduling"
+    prompt: "When are all of these people free: alice@company.com, bob@company.com, charlie@company.com"
+    expected_skill: "google-tools:google-calendar"
+    max_turns: 5
+    model: opus
+
+  # Gmail filter management skill evals
+  - name: "gmail-filter-create"
+    prompt: "Create a Gmail filter that labels emails from my boss ali@datafoo.com as important"
+    expected_skill: "google-tools:gmail"
+    max_turns: 5
+    model: opus
+
+  - name: "gmail-filter-list"
+    prompt: "Show me all my Gmail filters and label rules"
+    expected_skill: "google-tools:gmail"
+    max_turns: 5
+    model: opus
+
+  # Google Tasks skill evals
+  - name: "google-tasks-create-task"
+    prompt: "Add a task to remember to buy groceries tomorrow"
+    expected_skill: "google-tools:google-tasks"
+    max_turns: 5
+    model: opus
+
+  - name: "google-tasks-list-tasks"
+    prompt: "Show me all my tasks in Google Tasks"
+    expected_skill: "google-tools:google-tasks"
+    max_turns: 5
+    model: opus
+
+  # Google Forms skill evals
+  - name: "google-forms-create-survey"
+    prompt: "Create a customer feedback survey with rating questions"
+    expected_skill: "google-tools:google-forms"
+    max_turns: 5
+    model: opus
+
+  - name: "google-forms-read-responses"
+    prompt: "Show me the responses from my Google Form"
+    expected_skill: "google-tools:google-forms"
+    max_turns: 5
+    model: opus
+
+  # Databricks Lineage skill evals
+  - name: "lineage-table-upstream"
+    prompt: "Show me the upstream lineage for main.sales.orders table"
+    expected_skill: "databricks-tools:databricks-lineage"
+    max_turns: 5
+    model: opus
+
+  - name: "lineage-impact-analysis"
+    prompt: "What downstream tables will be affected if I change the customer table schema?"
+    expected_skill: "databricks-tools:databricks-lineage"
+    max_turns: 5
+    model: opus
+
+  # Databricks Workspace Files skill evals
+  - name: "workspace-files-list-notebooks"
+    prompt: "List the notebooks in my Databricks workspace under /Users/me@company.com"
+    expected_skill: "databricks-tools:databricks-workspace-files"
+    max_turns: 5
+    model: opus
+
+  - name: "workspace-files-export-notebook"
+    prompt: "Pull the ETL notebook from my Databricks workspace into context"
+    expected_skill: "databricks-tools:databricks-workspace-files"
+    max_turns: 5
+    model: opus
+
+  # FE Customer Training Courses skill evals
+  - name: "customer-courses-by-name"
+    prompt: "Create training recommendations for Meta"
+    expected_skill: "workflows:fe-customer-courses"
+    max_turns: 5
+    model: opus
+
+  - name: "customer-courses-training-plan-simple"
+    prompt: "create me a training plan for Block"
+    expected_skill: "workflows:fe-customer-courses"
+    max_turns: 5
+    model: opus
+
+  # Databricks Org Lookup skill evals
+  - name: "org-lookup-reports"
+    prompt: "Who reports to Maneesh Bhide?"
+    expected_skill: "internal-tools:databricks-org"
+    max_turns: 5
+    model: opus
+
+  - name: "org-lookup-manager"
+    prompt: "Who is Brandon Kvarda's manager?"
+    expected_skill: "internal-tools:databricks-org"
+    max_turns: 5
+    model: opus
+
+  # Architecture Diagram skill evals
+  - name: "architecture-diagram-data-pipeline"
+    prompt: "Create an architecture diagram showing data flow from Kafka to Databricks to Snowflake"
+    expected_skill: "workflows:fe-architecture-diagram"
+    max_turns: 5
+    model: opus
+
+  # Lakebase skill evals
+  - name: "lakebase-create-database"
+    prompt: "Create a lakebase database for my application"
+    expected_skill: "databricks-tools:databricks-lakebase"
+    max_turns: 5
+    model: opus
+
+  - name: "lakebase-autoscaling-postgres"
+    prompt: "Set up autoscaling postgres on databricks for my backend"
+    expected_skill: "databricks-tools:databricks-lakebase"
+    max_turns: 5
+    model: opus
+
+  # Lakeview Dashboard Analyzer skill evals
+  - name: "lakeview-dashboard-analyzer-summarize"
+    prompt: "Can you look at this lakeview dashboard and summarize what it says? https://fake-databricks-ws.cloud.databricks.com/sql/dashboardsv3/01f0234b-9c7a-4e6d-b123-abcdef987654"
+    expected_skill: "databricks-tools:databricks-lakeview-dashboard-analyzer"
+    max_turns: 5
+    model: opus
+
+  # Databricks Sizing (Quicksizer) skill evals
+  - name: "sizing-cost-estimate"
+    prompt: "Size an ETL workload: 500GB daily data on AWS Premium with 10 batch jobs"
+    expected_skill: "workflows:databricks-sizing"
+    max_turns: 5
+    model: opus
+
+  - name: "sizing-quicksizer"
+    prompt: "Use quicksizer to estimate Databricks costs for a customer"
+    expected_skill: "workflows:databricks-sizing"
+    max_turns: 5
+    model: opus
+
+  # Performance Tuning skill evals
+  - name: "performance-tuning-slow-query"
+    prompt: "My customer has a SQL query that takes 45 seconds on their SQL warehouse, help me optimize it"
+    expected_skill: "workflows:performance-tuning"
+    max_turns: 5
+    model: opus
+
+  - name: "performance-tuning-spark-job"
+    prompt: "Customer's ETL Spark job went from 2 hours to 8 hours after a data volume increase, help me diagnose"
+    expected_skill: "workflows:performance-tuning"
+    max_turns: 5
+    model: opus
+
+  # POC Document skill evals
+  - name: "poc-doc-create-for-customer"
+    prompt: "Create a POC document for the CrowdStrike evaluation of Unity Catalog"
+    expected_skill: "workflows:fe-poc-doc"
+    max_turns: 5
+    model: opus
+
+  - name: "poc-doc-from-opportunity"
+    prompt: "Build a POC doc for the Meta engagement. Here's the Salesforce opp: 0061234567890ABCDEF"
+    expected_skill: "workflows:fe-poc-doc"
+    max_turns: 5
+    model: opus
+
+  # "My accounts" / "My UCOs" scoping eval (Issue #343)
+  - name: "my-customers-onboarding-this-quarter"
+    prompt: "Which of my customers have use cases with onboarding dates this FY quarter?"
+    expected_skill_one_of:
+      - "salesforce-tools:salesforce-actions"
+      - "internal-tools:logfood-querier"
+    max_turns: 5
+    model: sonnet
+
+  - name: "ucos-confirming-stage"
+    prompt: "which of my UCOs are confirming?"
+    expected_skill_one_of:
+      - "salesforce-tools:salesforce-actions"
+      - "internal-tools:logfood-querier"
+    max_turns: 5
+    model: sonnet
+
+  # centralized-system-tables-translator
+  - name: "translate-system-table-query"
+    prompt: "translate this system.billing.usage query to use centralized system tables"
+    expected_skill: "internal-tools:centralized-system-tables-translator"
+    max_turns: 5
+    model: opus
+
+  - name: "convert-query-to-centralized"
+    prompt: "convert this dashboard query from system.lakeflow.jobs to the centralized namespace"
+    expected_skill: "internal-tools:centralized-system-tables-translator"
+    max_turns: 5
+    model: opus
+
+  # Vibe Report Issue skill evals
+  - name: "report-issue-unexpected-result"
+    prompt: "I want to report a bug with vibe, the gmail skill gave me the wrong result"
+    expected_skill: "vibe-setup:vibe-report-issue"
+    max_turns: 5
+    model: opus
+
+  - name: "report-issue-skill-not-invoked"
+    prompt: "File an issue - the databricks auth skill should have been invoked but it wasn't"
+    expected_skill: "vibe-setup:vibe-report-issue"
+    max_turns: 5
+    model: opus
+
+  # UCO Updates skill evals
+  - name: "uco-updates-explicit-invocation"
+    prompt: "Update my UCOs"
+    expected_skill: "salesforce-tools:uco-updates"
+    max_turns: 5
+    model: sonnet
+
+  - name: "uco-updates-slash-command"
+    prompt: "/uco-updates"
+    expected_skill: "salesforce-tools:uco-updates"
+    max_turns: 3
+    model: sonnet
+
+  # Showcase skill evals
+  - name: "showcase-writeup-session"
+    prompt: "Write up what we just did as a showcase for other SAs"
+    expected_skill: "workflows:showcase"
+    max_turns: 5
+    model: opus
+
+  - name: "showcase-document-session"
+    prompt: "Document this Vibe session for the showcase library"
+    expected_skill: "workflows:showcase"
+    max_turns: 5
+    model: opus
+
+  # Synthetic Data Generation skill evals
+  - name: "synthetic-data-gen-financial"
+    prompt: "Generate synthetic financial data with accounts, trades, and transactions for a fraud detection demo"
+    expected_skill: "databricks-tools:databricks-data-generation"
+    max_turns: 5
+    model: opus
+
+  - name: "synthetic-data-gen-retail-demo"
+    prompt: "Generate synthetic retail data with customers, products, and transactions for a demo"
+    expected_skill: "databricks-tools:databricks-data-generation"
+    max_turns: 5
+    model: opus
+
+  # ASQ/STS routing evals
+  - name: "asq-specialist-request-creation"
+    prompt: "Create an ASQ specialist request for Acme Corp to get help with a Unity Catalog migration POC"
+    expected_skill_one_of:
+      - "salesforce-tools:salesforce-actions"
+      - "salesforce-tools:salesforce-authentication"
+    max_turns: 5
+    model: sonnet
+
+  - name: "sts-shared-technical-services-request"
+    prompt: "File an STS request for workspace setup and platform administration for my customer"
+    expected_skill_one_of:
+      - "salesforce-tools:salesforce-actions"
+      - "salesforce-tools:salesforce-authentication"
+    max_turns: 5
+    model: sonnet
+
+  # Databricks Learning Assistant skill evals
+  - name: "learning-assistant-databricks-feature"
+    prompt: "teach me how to use liquid clustering in Databricks"
+    expected_skill: "workflows:databricks-learning-assistant"
+    max_turns: 5
+    model: opus
+
+  - name: "learning-assistant-learn-lakeflow"
+    prompt: "I want to learn about Databricks Lakeflow Connect by deploying it"
+    expected_skill: "workflows:databricks-learning-assistant"
+    max_turns: 5
+    model: opus
+
+  # Competitive Analysis (Full) - Comprehensive research with explicit trigger words
+  - name: "compete-full-snowflake-create-battlecard"
+    prompt: "Create a comprehensive battlecard comparing Databricks to Snowflake for streaming"
+    expected_skill: "workflows:competitive-analysis"
+    max_turns: 5
+    model: opus
+
+  # Competitive Analysis - Fast mode (default, no comprehensive keywords)
+  - name: "compete-fast-redshift-simple"
+    prompt: "Why Databricks over Redshift?"
+    expected_skill: "workflows:competitive-analysis"
+    max_turns: 3
+    model: opus
+
+  # Interview Prep skill evals
+  - name: "interview-prep-design-architecture"
+    prompt: "I need to prepare for an SA design and architecture interview tomorrow, help me build an interview plan for the candidate"
+    expected_skill: "workflows:interview-prep"
+    max_turns: 5
+    model: opus
+
+  - name: "interview-prep-candidate-resume"
+    prompt: "I have a candidate interview coming up, here's their resume - help me create a structured interview plan with probing questions"
+    expected_skill: "workflows:interview-prep"
+    max_turns: 5
+    model: opus
+
+  # macOS Scheduler skill evals (darwin-only — skipped on Linux CI)
+  - name: "scheduler-create-slack-task"
+    prompt: "Schedule a recurring task to send a Slack DM to myself saying hello every morning"
+    expected_skill: "macos-scheduler:macos-scheduler"
+    platform: darwin
+    max_turns: 5
+    model: opus
+
+  - name: "scheduler-list-tasks"
+    prompt: "List all my scheduled tasks"
+    expected_skill: "macos-scheduler:macos-scheduler"
+    platform: darwin
+    max_turns: 5
+    model: opus
+
+  # FE Account TAP Map skill evals
+  - name: "tap-map-account-planning"
+    prompt: "Build a TAP map for Compass"
+    expected_skill: "workflows:fe-account-tap-map"
+    max_turns: 5
+    model: sonnet
+
+  - name: "tap-map-sfdc-writeback"
+    prompt: "Generate a TAM architecture powerbase map for Zillow with SFDC writeback"
+    expected_skill: "workflows:fe-account-tap-map"
+    max_turns: 5
+    model: sonnet
+
+  # Account Review Deck skill evals
+  - name: "qbr-deck-for-customer"
+    prompt: "Create a QBR deck for Rivian for our December quarterly business review"
+    expected_skill: "workflows:account-review-deck"
+    max_turns: 5
+    model: sonnet
+
+  - name: "account-review-ebc"
+    prompt: "Build an account review deck for our upcoming EBC with Hinge"
+    expected_skill: "workflows:account-review-deck"
+    max_turns: 5
+    model: sonnet
+
+  # FE RFP Response Assistant skill evals
+  - name: "rfp-single-question"
+    prompt: "Answer this RFP question: Does Databricks support role-based access control?"
+    expected_skill: "workflows:fe-rfp"
+    max_turns: 5
+    model: sonnet
+
+  - name: "rfp-batch-csv"
+    prompt: "I have a CSV of RFP questions I need to answer for a customer on AWS"
+    expected_skill: "workflows:fe-rfp"
+    max_turns: 5
+    model: sonnet
+

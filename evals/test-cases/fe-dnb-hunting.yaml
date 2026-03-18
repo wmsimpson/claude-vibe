@@ -1,0 +1,21 @@
+name: "DNB Hunting Plugin Tests"
+description: "Verify Claude Code invokes correct skills for DNB Hunter team prompts"
+
+tests:
+  - name: "dnb-hunter-poc-doc-slash-command"
+    prompt: "/dnb-hunter-poc-doc"
+    expected_skill: "fe-dnb-hunting:dnb-hunter-poc-doc"
+    max_turns: 3
+    model: opus
+
+  - name: "dnb-hunter-poc-doc-explicit"
+    prompt: "Use the dnb-hunter-poc-doc skill to create a POC doc for Acme Corp"
+    expected_skill: "fe-dnb-hunting:dnb-hunter-poc-doc"
+    max_turns: 5
+    model: opus
+
+  - name: "dnb-hunter-poc-doc-with-uco"
+    prompt: "/dnb-hunter-poc-doc for this UCO: https://databricks.lightning.force.com/lightning/r/UseCase__c/aAv8Z000000ArXXXXX/view"
+    expected_skill: "fe-dnb-hunting:dnb-hunter-poc-doc"
+    max_turns: 5
+    model: opus

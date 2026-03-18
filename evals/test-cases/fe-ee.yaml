@@ -1,0 +1,9 @@
+name: "EE Plugin Tests"
+description: "Verify Claude Code invokes correct skills for EE team prompts"
+
+tests:
+  - name: "ae-uco-hygiene-natural-language"
+    prompt: "audit my team's UCO hygiene"
+    expected_skill: "fe-ee:ae-uco-hygiene"
+    max_turns: 5
+    model: sonnet

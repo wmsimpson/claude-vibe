@@ -1,0 +1,63 @@
+name: "fe-ssagent Skill Routing Tests"
+description: "Verify Claude Code invokes correct fe-ssagent skills for ASQ/SSA prompts"
+
+tests:
+  - name: "ssagent-new-asq-invoke"
+    prompt: "/ssagent-new-asq AR-000098660"
+    expected_skill: "fe-ssagent:ssagent-new-asq"
+    max_turns: 3
+    model: haiku
+
+  - name: "ssagent-new-asq-natural-language"
+    prompt: "set up a new engagement folder for my munich re ASQ"
+    expected_skill: "fe-ssagent:ssagent-new-asq"
+    max_turns: 5
+    model: sonnet
+
+  - name: "ssagent-researcher-ar-number"
+    prompt: "research my new ASQ AR-000098660"
+    expected_skill: "fe-ssagent:ssagent-researcher"
+    max_turns: 5
+    model: sonnet
+
+  - name: "ssagent-researcher-brief-me"
+    prompt: "brief me on my new specialist request"
+    expected_skill: "fe-ssagent:ssagent-researcher"
+    max_turns: 5
+    model: sonnet
+
+  - name: "ssagent-notes-ar-number"
+    prompt: "/ssagent-notes AR-000098660"
+    expected_skill: "fe-ssagent:ssagent-notes"
+    max_turns: 3
+    model: haiku
+
+  - name: "ssagent-notes-customer-name"
+    prompt: "add a note to my santander ASQ"
+    expected_skill: "fe-ssagent:ssagent-notes"
+    max_turns: 5
+    model: sonnet
+
+  - name: "ssagent-close-ar-number"
+    prompt: "/ssagent-close AR-000098660"
+    expected_skill: "fe-ssagent:ssagent-close"
+    max_turns: 3
+    model: haiku
+
+  - name: "ssagent-close-natural-language"
+    prompt: "close out my telefonica ASQ, the engagement is finished"
+    expected_skill: "fe-ssagent:ssagent-close"
+    max_turns: 5
+    model: sonnet
+
+  - name: "ssagent-weekly-invoke"
+    prompt: "/ssagent-weekly"
+    expected_skill: "fe-ssagent:ssagent-weekly"
+    max_turns: 3
+    model: haiku
+
+  - name: "ssagent-weekly-natural-language"
+    prompt: "do my weekly ASQ notes update"
+    expected_skill: "fe-ssagent:ssagent-weekly"
+    max_turns: 5
+    model: sonnet

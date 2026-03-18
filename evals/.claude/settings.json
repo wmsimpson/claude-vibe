@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Skill",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -c '{timestamp: now, skill: .tool_input.skill, args: .tool_input.args}' >> \"$EVAL_LOG_FILE\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

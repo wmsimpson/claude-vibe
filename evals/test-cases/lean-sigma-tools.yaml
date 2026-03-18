@@ -1,0 +1,39 @@
+name: "lean-sigma-tools Skill Routing Tests"
+description: "Verify Claude Code invokes correct lean-sigma-tools skills for SIPOC, FMEA, and process map prompts"
+
+tests:
+  - name: "sipoc-natural-language-create"
+    prompt: "Create a SIPOC for Acme's data ingestion pipeline"
+    expected_skill: "lean-sigma-tools:lean-sigma-sipoc"
+    max_turns: 5
+    model: sonnet
+
+  - name: "sipoc-natural-language-project-scope"
+    prompt: "Build a SIPOC diagram to define the scope of our Unity Catalog migration project"
+    expected_skill: "lean-sigma-tools:lean-sigma-sipoc"
+    max_turns: 5
+    model: sonnet
+
+  - name: "fmea-natural-language-run"
+    prompt: "Create a FMEA failure mode analysis for our data ingestion pipeline"
+    expected_skill: "lean-sigma-tools:lean-sigma-fmea"
+    max_turns: 3
+    model: sonnet
+
+  - name: "fmea-natural-language-risk-table"
+    prompt: "Generate a FMEA risk table with RPN scores for the failure modes in our Databricks pipeline"
+    expected_skill: "lean-sigma-tools:lean-sigma-fmea"
+    max_turns: 5
+    model: sonnet
+
+  - name: "process-map-natural-language-swimlane"
+    prompt: "Create a swimlane diagram for the ML deployment workflow"
+    expected_skill: "lean-sigma-tools:lean-sigma-process-map"
+    max_turns: 5
+    model: sonnet
+
+  - name: "process-map-natural-language-waste"
+    prompt: "Build a Lean process map with VA/NVA waste classification for our data onboarding workflow"
+    expected_skill: "lean-sigma-tools:lean-sigma-process-map"
+    max_turns: 5
+    model: sonnet

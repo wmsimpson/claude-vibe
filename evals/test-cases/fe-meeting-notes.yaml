@@ -1,0 +1,15 @@
+name: "Customer Meeting Notes Organizer Tests"
+description: "Verify Claude Code invokes logcall skill for meeting note workflows"
+
+tests:
+  - name: "logcall-natural-language"
+    prompt: "log my customer meeting notes from today's call"
+    expected_skill: "fe-meeting-notes:logcall"
+    max_turns: 5
+    model: sonnet
+
+  - name: "logcall-capture-notes"
+    prompt: "I just had a meeting with Acme Corp, can you help me capture the notes?"
+    expected_skill: "fe-meeting-notes:logcall"
+    max_turns: 5
+    model: sonnet

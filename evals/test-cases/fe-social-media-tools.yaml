@@ -1,0 +1,15 @@
+name: "fe-social-media-tools Skill Routing Tests"
+description: "Verify Claude Code invokes correct fe-social-media-tools skills for LinkedIn post generation prompts"
+
+tests:
+  - name: "linkedin-post-generator-slash-command"
+    prompt: "/linkedin-post-generator"
+    expected_skill: "fe-social-media-tools:linkedin-post-generator"
+    max_turns: 3
+    model: opus
+
+  - name: "linkedin-post-generator-natural-language"
+    prompt: "Use the linkedin post generator to create posts from my please promote emails"
+    expected_skill: "fe-social-media-tools:linkedin-post-generator"
+    max_turns: 5
+    model: sonnet
