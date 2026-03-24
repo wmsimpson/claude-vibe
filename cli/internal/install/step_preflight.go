@@ -27,22 +27,23 @@ func (s *PreflightStep) Check(ctx *Context) (bool, error) {
 func (s *PreflightStep) Run(ctx *Context) StepResult {
 	var details []string
 
-	// Check macOS
-	if runtime.GOOS != "darwin" {
+	// Check platform
+	switch runtime.GOOS {
+	case "darwin":
+		details = append(details, "macOS detected")
+		if runtime.GOARCH == "arm64" {
+			details = append(details, "Apple Silicon (arm64)")
+		} else if runtime.GOARCH == "amd64" {
+			details = append(details, "Intel (amd64)")
+		}
+	case "linux":
+		details = append(details, "Linux detected ("+runtime.GOARCH+")")
+	default:
 		return FailureWithHint(
-			"Not running on macOS",
-			errors.New("vibe only supports macOS"),
-			"Run this installer on a Mac",
+			fmt.Sprintf("Unsupported platform: %s", runtime.GOOS),
+			errors.New("vibe supports macOS and Linux (including WSL)"),
+			"On Windows, install WSL first: wsl --install",
 		)
-	}
-	details = append(details, "macOS detected")
-
-	// Check architecture
-	arch := runtime.GOARCH
-	if arch == "arm64" {
-		details = append(details, "Apple Silicon (arm64)")
-	} else if arch == "amd64" {
-		details = append(details, "Intel (amd64)")
 	}
 
 	// Check disk space (need at least 500MB free)
