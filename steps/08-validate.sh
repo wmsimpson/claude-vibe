@@ -12,10 +12,10 @@ step_validate() {
   print_step "Claude Code"
   if command -v claude &>/dev/null; then
     print_success "claude $(claude --version 2>&1)"
-    ((pass++))
+    pass=$((pass + 1))
   else
     print_error "claude not found"
-    ((fail++))
+    fail=$((fail + 1))
   fi
 
   # ── Google Auth ─────────────────────────────────────────────────────────
@@ -25,10 +25,10 @@ step_validate() {
   token=$(gcloud auth application-default print-access-token 2>/dev/null)
   if [[ -n "$token" ]]; then
     print_success "Access token valid (${#token} chars)"
-    ((pass++))
+    pass=$((pass + 1))
   else
     print_error "No valid access token"
-    ((fail++))
+    fail=$((fail + 1))
   fi
 
   # ── Google APIs ─────────────────────────────────────────────────────────
@@ -58,10 +58,10 @@ step_validate() {
         -H "Authorization: Bearer $token" \
         -H "x-goog-user-project: $gcp_project" 2>/dev/null)
       case "$code" in
-        200|404) print_success "$name"; ((pass++)) ;;
-        403)     print_error "$name (403 — check quota project)"; ((fail++)) ;;
-        401)     print_error "$name (401 — re-auth needed)"; ((fail++)) ;;
-        *)       print_warn "$name (HTTP $code)"; ((warn++)) ;;
+        200|404) print_success "$name"; pass=$((pass + 1)) ;;
+        403)     print_error "$name (403 — check quota project)"; fail=$((fail + 1)) ;;
+        401)     print_error "$name (401 — re-auth needed)"; fail=$((fail + 1)) ;;
+        *)       print_warn "$name (HTTP $code)"; warn=$((warn + 1)) ;;
       esac
     done
   fi
@@ -74,19 +74,19 @@ step_validate() {
       local ver
       ver=$($tool --version 2>/dev/null | head -1)
       print_success "$tool ${DIM}${ver}${NC}"
-      ((pass++))
+      pass=$((pass + 1))
     else
       print_error "$tool not found"
-      ((fail++))
+      fail=$((fail + 1))
     fi
   done
   # graphviz (dot) — check separately since the binary name differs
   if command -v dot &>/dev/null || [[ -x /usr/local/bin/dot ]]; then
     print_success "graphviz (dot)"
-    ((pass++))
+    pass=$((pass + 1))
   else
     print_warn "graphviz (dot) not found"
-    ((warn++))
+    warn=$((warn + 1))
   fi
 
   # ── Databricks AI Dev Kit (optional) ──────────────────────────────────
@@ -97,10 +97,10 @@ step_validate() {
     skill_count=$(ls "$HOME/.claude/skills/" 2>/dev/null | wc -l | tr -d ' ')
     if [[ $skill_count -gt 0 ]]; then
       print_success "$skill_count skills in ~/.claude/skills/"
-      ((pass++))
+      pass=$((pass + 1))
     else
       print_warn "No skills found in ~/.claude/skills/"
-      ((warn++))
+      warn=$((warn + 1))
     fi
   fi
 
@@ -128,7 +128,7 @@ print(f'{enabled}|{skills}')
       ((pass += 2))
     else
       print_warn "No plugins or settings found"
-      ((warn++))
+      warn=$((warn + 1))
     fi
   }
 
@@ -146,7 +146,7 @@ for name in cfg.get('mcpServers', {}):
     print(name)
 " 2>/dev/null | while read -r server; do
     print_success "$server"
-    ((pass++))
+    pass=$((pass + 1))
   done
 
   # ── GitHub MCP live test ────────────────────────────────────────────────
@@ -161,10 +161,10 @@ for name in cfg.get('mcpServers', {}):
         GITHUB_PERSONAL_ACCESS_TOKEN="$gh_token" timeout 15 npx -y @modelcontextprotocol/server-github 2>/dev/null | head -1)
       if echo "$result" | python3 -c "import sys,json; json.loads(sys.stdin.readline())['result']" &>/dev/null; then
         print_success "GitHub MCP server responds"
-        ((pass++))
+        pass=$((pass + 1))
       else
         print_warn "GitHub MCP did not respond (may need npx download)"
-        ((warn++))
+        warn=$((warn + 1))
       fi
     fi
   fi
@@ -172,8 +172,8 @@ for name in cfg.get('mcpServers', {}):
   # ── Environment ─────────────────────────────────────────────────────────
   print_blank
   print_step "Environment"
-  [[ -f "$HOME/.vibe/env" ]] && print_success "~/.vibe/env exists" && ((pass++)) || { print_error "~/.vibe/env missing"; ((fail++)); }
-  [[ -f "$HOME/.config/gcloud/credentials/claude-google-auth.json" ]] && print_success "OAuth credentials file exists" && ((pass++)) || print_warn "OAuth credentials not in standard location"
+  [[ -f "$HOME/.vibe/env" ]] && print_success "~/.vibe/env exists" && pass=$((pass + 1)) || { print_error "~/.vibe/env missing"; fail=$((fail + 1)); }
+  [[ -f "$HOME/.config/gcloud/credentials/claude-google-auth.json" ]] && print_success "OAuth credentials file exists" && pass=$((pass + 1)) || print_warn "OAuth credentials not in standard location"
 
   # Check for clean shell RC
   local shell_rc="${VIBE_SHELL_RC:-$HOME/.zprofile}"
@@ -183,10 +183,10 @@ for name in cfg.get('mcpServers', {}):
   dup_count=$(grep -c 'HOME/.local/bin' "$shell_rc" 2>/dev/null || echo 0)
   if [[ $dup_count -gt 1 ]]; then
     print_warn "~/$rc_name has duplicate PATH entries ($dup_count)"
-    ((warn++))
+    warn=$((warn + 1))
   else
     print_success "~/$rc_name is clean"
-    ((pass++))
+    pass=$((pass + 1))
   fi
 
   # ── Summary ─────────────────────────────────────────────────────────────

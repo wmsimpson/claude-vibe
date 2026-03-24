@@ -62,12 +62,12 @@ step_install_plugins() {
     print_step "Installing $plugin..."
     if claude plugin install "${plugin}@claude-vibe" &>/dev/null; then
       print_success "$plugin"
-      ((installed++))
+      installed=$((installed + 1))
     else
       # Fallback: install from local path directly
       if claude plugin install "${plugin}@${VIBE_HOME}" &>/dev/null; then
         print_success "$plugin (local)"
-        ((installed++))
+        installed=$((installed + 1))
       else
         print_error "$plugin — install failed"
       fi

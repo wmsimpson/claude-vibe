@@ -105,7 +105,7 @@ show_overview() {
     local step_name="${STEPS[$i]##*|}"
     if is_step_complete "$step_id"; then
       echo -e "    ${CHECK} ${DIM}${step_name}${NC}"
-      ((completed++))
+      completed=$((completed + 1))
     else
       echo -e "    ${BULLET} ${step_name}"
     fi
