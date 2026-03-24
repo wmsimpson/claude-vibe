@@ -139,6 +139,17 @@
       },
       "category": "productivity",
       "keywords": ["lean", "six-sigma", "SIPOC", "FMEA", "process-map", "dmaic", "risk"]
+    },
+    {
+      "name": "community-skills",
+      "source": "./plugins/community-skills",
+      "description": "Community skills: humanizer (natural writing), PPTX creator/editor, find-skills, web design guidelines, Spark Python data sources",
+      "version": "1.0.0",
+      "author": {
+        "name": "Will Simpson"
+      },
+      "category": "productivity",
+      "keywords": ["humanizer", "pptx", "powerpoint", "web-design", "spark", "skills"]
     }
   ]
 }
