@@ -25,19 +25,19 @@ LDFLAGS := -X main.version=$(VERSION) -X main.commit=$(COMMIT) -X main.date=$(DA
 
 # Add zerobus credentials if provided
 ifneq ($(ZEROBUS_CLIENT_ID),)
-LDFLAGS += -X github.com/will-simpson/individual-vibe-tool/cli/internal/telemetry.ZerobusClientID=$(ZEROBUS_CLIENT_ID)
+LDFLAGS += -X github.com/wmsimpson/claude-vibe/cli/internal/telemetry.ZerobusClientID=$(ZEROBUS_CLIENT_ID)
 endif
 ifneq ($(ZEROBUS_CLIENT_SECRET),)
-LDFLAGS += -X github.com/will-simpson/individual-vibe-tool/cli/internal/telemetry.ZerobusClientSecret=$(ZEROBUS_CLIENT_SECRET)
+LDFLAGS += -X github.com/wmsimpson/claude-vibe/cli/internal/telemetry.ZerobusClientSecret=$(ZEROBUS_CLIENT_SECRET)
 endif
 ifneq ($(ZEROBUS_ENDPOINT),)
-LDFLAGS += -X github.com/will-simpson/individual-vibe-tool/cli/internal/telemetry.ZerobusEndpoint=$(ZEROBUS_ENDPOINT)
+LDFLAGS += -X github.com/wmsimpson/claude-vibe/cli/internal/telemetry.ZerobusEndpoint=$(ZEROBUS_ENDPOINT)
 endif
 ifneq ($(ZEROBUS_UNITY_CATALOG_URL),)
-LDFLAGS += -X github.com/will-simpson/individual-vibe-tool/cli/internal/telemetry.ZerobusUnityCatalogURL=$(ZEROBUS_UNITY_CATALOG_URL)
+LDFLAGS += -X github.com/wmsimpson/claude-vibe/cli/internal/telemetry.ZerobusUnityCatalogURL=$(ZEROBUS_UNITY_CATALOG_URL)
 endif
 ifneq ($(ZEROBUS_TABLE_NAME),)
-LDFLAGS += -X github.com/will-simpson/individual-vibe-tool/cli/internal/telemetry.ZerobusTableName=$(ZEROBUS_TABLE_NAME)
+LDFLAGS += -X github.com/wmsimpson/claude-vibe/cli/internal/telemetry.ZerobusTableName=$(ZEROBUS_TABLE_NAME)
 endif
 
 # Dictation helper (macOS only)
