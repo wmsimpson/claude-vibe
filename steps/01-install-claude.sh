@@ -13,39 +13,45 @@ step_install_claude() {
     fi
   fi
 
-  # Detect AVX support
-  print_step "Checking CPU features..."
-  local has_avx=false
-  if sysctl -a 2>/dev/null | grep machdep.cpu.features | grep -qi avx; then
-    has_avx=true
-    print_success "CPU supports AVX"
+  # On Linux, always use npm (no Homebrew cask available)
+  if [[ "$VIBE_PLATFORM" != "macos" ]]; then
+    print_info "Installing Claude Code via npm..."
+    _install_claude_npm
   else
-    print_warn "CPU does not support AVX"
-  fi
+    # macOS: detect AVX support for Homebrew cask option
+    print_step "Checking CPU features..."
+    local has_avx=false
+    if sysctl -a 2>/dev/null | grep machdep.cpu.features | grep -qi avx; then
+      has_avx=true
+      print_success "CPU supports AVX"
+    else
+      print_warn "CPU does not support AVX"
+    fi
 
-  # Choose install method
-  if $has_avx; then
-    echo ""
-    print_info "Your CPU supports AVX — both install methods will work."
-    local method
-    method=$(ask_select "Choose install method:" "Homebrew Cask (recommended)" "npm (universal)")
-    if [[ "$method" == "Homebrew Cask (recommended)" ]]; then
-      print_step "Installing via Homebrew..."
-      if run_with_spinner "Installing claude-code cask..." brew install --cask claude-code; then
-        print_success "Claude Code installed via Homebrew"
+    # Choose install method
+    if $has_avx; then
+      echo ""
+      print_info "Your CPU supports AVX — both install methods will work."
+      local method
+      method=$(ask_select "Choose install method:" "Homebrew Cask (recommended)" "npm (universal)")
+      if [[ "$method" == "Homebrew Cask (recommended)" ]]; then
+        print_step "Installing via Homebrew..."
+        if run_with_spinner "Installing claude-code cask..." brew install --cask claude-code; then
+          print_success "Claude Code installed via Homebrew"
+        else
+          print_error "Homebrew install failed — falling back to npm"
+          _install_claude_npm
+        fi
       else
-        print_error "Homebrew install failed — falling back to npm"
         _install_claude_npm
       fi
     else
+      echo ""
+      print_info "The Homebrew cask uses Bun which requires AVX."
+      print_info "Installing via npm (uses Node.js — works on all CPUs)."
+      echo ""
       _install_claude_npm
     fi
-  else
-    echo ""
-    print_info "The Homebrew cask uses Bun which requires AVX."
-    print_info "Installing via npm (uses Node.js — works on all CPUs)."
-    echo ""
-    _install_claude_npm
   fi
 
   # Verify

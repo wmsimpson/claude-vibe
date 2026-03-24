@@ -58,7 +58,9 @@ step_install_tools() {
     print_success "Google Cloud SDK"
   else
     print_step "Installing Google Cloud SDK..."
-    if run_with_spinner "brew install google-cloud-sdk..." brew install --cask google-cloud-sdk; then
+    local gcloud_cmd="brew install --cask google-cloud-sdk"
+    [[ "$VIBE_PLATFORM" != "macos" ]] && gcloud_cmd="brew install google-cloud-sdk"
+    if run_with_spinner "Installing google-cloud-sdk..." $gcloud_cmd; then
       print_success "Google Cloud SDK installed"
     else
       print_error "gcloud install failed — install manually from cloud.google.com/sdk"
@@ -81,29 +83,29 @@ step_install_tools() {
     print_info "Databricks CLI — ${DIM}skipped (not enabled)${NC}"
   fi
 
-  # ── Configure ~/.zprofile ──────────────────────────────────────────────
+  # ── Configure shell RC file ──────────────────────────────────────────────
   print_blank
   print_step "Configuring shell environment..."
 
-  local zprofile="$HOME/.zprofile"
+  local shell_rc="${VIBE_SHELL_RC:-$HOME/.zprofile}"
   local needs_update=false
 
   # Ensure PATH
-  if ! grep -q 'HOME/.local/bin' "$zprofile" 2>/dev/null; then
-    echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$zprofile"
+  if ! grep -q 'HOME/.local/bin' "$shell_rc" 2>/dev/null; then
+    echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$shell_rc"
     needs_update=true
   fi
 
   # Ensure vibe env sourcing
-  if ! grep -q '.vibe/env' "$zprofile" 2>/dev/null; then
-    echo '[ -f ~/.vibe/env ] && source ~/.vibe/env' >> "$zprofile"
+  if ! grep -q '.vibe/env' "$shell_rc" 2>/dev/null; then
+    echo '[ -f ~/.vibe/env ] && source ~/.vibe/env' >> "$shell_rc"
     needs_update=true
   fi
 
   if $needs_update; then
-    print_success "Updated ~/.zprofile"
+    print_success "Updated $(basename "$shell_rc")"
   else
-    print_success "~/.zprofile already configured"
+    print_success "$(basename "$shell_rc") already configured"
   fi
 
   # ── Create ~/.vibe/env ─────────────────────────────────────────────────
@@ -113,7 +115,7 @@ step_install_tools() {
     [[ -f "$HOME/.claude-vibe/gcp-project-id" ]] && gcp_project=$(cat "$HOME/.claude-vibe/gcp-project-id")
 
     cat > "$HOME/.vibe/env" << ENVEOF
-# ~/.vibe/env — sourced automatically by ~/.zprofile
+# ~/.vibe/env — sourced automatically by $(basename "$shell_rc")
 # Tokens and environment variables for Claude Vibe
 
 export GCP_QUOTA_PROJECT=${gcp_project:-your-gcp-project-id}
@@ -133,12 +135,16 @@ ENVEOF
       local proj
       proj=$(cat "$HOME/.claude-vibe/gcp-project-id")
       if grep -q "your-gcp-project-id" "$HOME/.vibe/env"; then
-        sed -i '' "s/your-gcp-project-id/$proj/" "$HOME/.vibe/env"
+        if [[ "$VIBE_PLATFORM" == "macos" ]]; then
+          sed -i '' "s/your-gcp-project-id/$proj/" "$HOME/.vibe/env"
+        else
+          sed -i "s/your-gcp-project-id/$proj/" "$HOME/.vibe/env"
+        fi
         print_info "Updated GCP_QUOTA_PROJECT to $proj"
       fi
     fi
   fi
 
-  source "$HOME/.zprofile" 2>/dev/null
+  source "$shell_rc" 2>/dev/null
   mark_step_complete "install_tools"
 }

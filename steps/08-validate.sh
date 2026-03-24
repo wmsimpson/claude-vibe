@@ -175,14 +175,17 @@ for name in cfg.get('mcpServers', {}):
   [[ -f "$HOME/.vibe/env" ]] && print_success "~/.vibe/env exists" && ((pass++)) || { print_error "~/.vibe/env missing"; ((fail++)); }
   [[ -f "$HOME/.config/gcloud/credentials/claude-google-auth.json" ]] && print_success "OAuth credentials file exists" && ((pass++)) || print_warn "OAuth credentials not in standard location"
 
-  # Check for clean zprofile
+  # Check for clean shell RC
+  local shell_rc="${VIBE_SHELL_RC:-$HOME/.zprofile}"
+  local rc_name
+  rc_name="$(basename "$shell_rc")"
   local dup_count
-  dup_count=$(grep -c 'HOME/.local/bin' "$HOME/.zprofile" 2>/dev/null)
+  dup_count=$(grep -c 'HOME/.local/bin' "$shell_rc" 2>/dev/null || echo 0)
   if [[ $dup_count -gt 1 ]]; then
-    print_warn "~/.zprofile has duplicate PATH entries ($dup_count)"
+    print_warn "~/$rc_name has duplicate PATH entries ($dup_count)"
     ((warn++))
   else
-    print_success "~/.zprofile is clean"
+    print_success "~/$rc_name is clean"
     ((pass++))
   fi
 

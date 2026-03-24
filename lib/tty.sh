@@ -316,9 +316,31 @@ require_command() {
   return 0
 }
 
-require_macos() {
-  if [[ "$(uname)" != "Darwin" ]]; then
-    print_error "This installer requires macOS"
-    exit 1
+# ── Platform detection ────────────────────────────────────────────────────
+# Sets VIBE_PLATFORM (macos|linux) and VIBE_SHELL_RC (~/.zprofile or ~/.bashrc)
+detect_platform() {
+  case "$(uname -s)" in
+    Darwin) VIBE_PLATFORM="macos" ;;
+    Linux)  VIBE_PLATFORM="linux" ;;
+    *)
+      print_error "Unsupported platform: $(uname -s)"
+      print_info "Claude Vibe supports macOS and Linux (including WSL)."
+      print_info "On Windows, install WSL first: wsl --install"
+      exit 1
+      ;;
+  esac
+
+  if [[ "$VIBE_PLATFORM" == "macos" ]] || [[ "$(basename "${SHELL:-zsh}")" == "zsh" ]]; then
+    VIBE_SHELL_RC="$HOME/.zprofile"
+  else
+    VIBE_SHELL_RC="$HOME/.bashrc"
   fi
+
+  export VIBE_PLATFORM VIBE_SHELL_RC
 }
+
+# Run detection on source
+detect_platform
+
+# Back-compat: no-op so existing callers don't break
+require_macos() { :; }
