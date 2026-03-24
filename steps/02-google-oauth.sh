@@ -4,6 +4,25 @@
 step_google_oauth() {
   print_header "Step 2 of 8 — Google OAuth Setup"
 
+  # Ensure gcloud is available (normally installed in Step 4, but needed here)
+  if ! command -v gcloud &>/dev/null; then
+    print_step "Installing Google Cloud SDK (required for OAuth)..."
+    if command -v brew &>/dev/null; then
+      local gcloud_cmd="brew install --cask google-cloud-sdk"
+      [[ "${VIBE_PLATFORM:-macos}" != "macos" ]] && gcloud_cmd="brew install google-cloud-sdk"
+      if run_with_spinner "Installing google-cloud-sdk..." $gcloud_cmd; then
+        print_success "Google Cloud SDK installed"
+      else
+        print_error "Failed to install gcloud — install manually: https://cloud.google.com/sdk/docs/install"
+        return 1
+      fi
+    else
+      print_error "gcloud not found and Homebrew not available"
+      print_info "Install gcloud manually: https://cloud.google.com/sdk/docs/install"
+      return 1
+    fi
+  fi
+
   local cred_dir="$HOME/.config/gcloud/credentials"
 
   # Use profile name in credential filename to avoid collisions
