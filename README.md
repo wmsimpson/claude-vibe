@@ -1,6 +1,6 @@
 # Claude Vibe
 
-A guided interactive setup for a fully-equipped local AI development environment using Claude Code on macOS.
+A guided interactive setup for a fully-equipped local AI development environment using Claude Code.
 
 One command gets you:
 - **Claude Code** with AVX-aware install (npm or Homebrew)
@@ -13,31 +13,57 @@ One command gets you:
 
 ## Quick Start
 
-Make sure [Homebrew](https://brew.sh) is installed first, then:
+### macOS
+
+Open Terminal and run:
 
 ```bash
+# 1. Install Homebrew (if you don't have it)
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# 2. Install git (if you don't have it)
+brew install git
+
+# 3. Clone and run
 git clone https://github.com/wmsimpson/claude-vibe.git
 cd claude-vibe
-./setup.sh
+./bootstrap.sh
 ```
 
-This installs the `vibe` command and launches the interactive installer. You'll be prompted about optional integrations (Databricks, Slack, etc.) so only the tools you need get installed. From then on, use `vibe` directly from anywhere.
+### Windows
 
-## Building the Go CLI (optional)
+Claude Vibe runs inside WSL (Windows Subsystem for Linux). Open PowerShell as Administrator and run:
 
-The Go CLI provides a richer experience with an interactive TUI, doctor diagnostics,
-and profile management. The shell-based `vibe` command works without it, but the
-Go CLI adds:
-- Interactive TUI for configuration (`vibe configure`)
-- Health checks with auto-repair (`vibe doctor`)
-- Self-updating (`vibe update`)
+```powershell
+# 1. Install WSL with Ubuntu
+wsl --install
+
+# 2. Restart your computer, then open the Ubuntu terminal and run:
+```
+
+Then inside the Ubuntu terminal:
 
 ```bash
-cd claude-vibe/cli
-go build -o ~/.local/bin/vibe ./cmd/vibe/
+# 3. Install Homebrew for Linux
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+echo >> ~/.bashrc
+echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ~/.bashrc
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
+# 4. Install git
+brew install git
+
+# 5. Clone and run
+git clone https://github.com/wmsimpson/claude-vibe.git
+cd claude-vibe
+./bootstrap.sh
 ```
 
-Requires [Go 1.24+](https://go.dev/dl/).
+### What happens next
+
+`bootstrap.sh` checks that your system has everything it needs (Homebrew, git, a Claude subscription), installs the `vibe` CLI, builds the Go binary if Go is available, and launches the interactive installer. The installer walks you through 8 steps and prompts about optional integrations (Databricks, Slack, etc.) so only the tools you need get installed.
+
+From then on, use `vibe` from anywhere.
 
 ## Usage
 
@@ -96,54 +122,37 @@ During setup, you can install all plugins or select specific ones interactively.
 
 ## Prerequisites
 
-Before running `./setup.sh`, make sure you have the following:
+`bootstrap.sh` checks all of these for you, but here's what you need:
 
 ### Required
 
-| Prerequisite | Why | Install |
-|---|---|---|
-| **macOS** (Intel or Apple Silicon) | This tool is macOS-only (uses Homebrew, launchd, zsh) | — |
-| **Homebrew** | Installs all CLI tools (node, go, jq, gcloud, etc.) | `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"` |
-| **Git** | Clone the repo; also used by GitHub MCP integration | `brew install git` (or Xcode CLT: `xcode-select --install`) |
-| **Claude subscription** | Claude Code requires an active Anthropic plan | [claude.ai/pricing](https://claude.ai/pricing) — Pro ($20/mo) or Max ($100/mo recommended) |
+| Prerequisite | Why | macOS | Windows (WSL) |
+|---|---|---|---|
+| **Homebrew** | Installs all CLI tools | [brew.sh](https://brew.sh) | Same, inside WSL Ubuntu |
+| **Git** | Clone the repo | `brew install git` or `xcode-select --install` | `brew install git` |
+| **Claude subscription** | Claude Code needs an Anthropic plan | [claude.ai/pricing](https://claude.ai/pricing) | Same |
 
-### Recommended (installed automatically during setup if missing)
+### Installed automatically by `vibe install`
 
-These are installed by Step 4, but having them ahead of time speeds things up:
+You don't need to install these yourself. Step 4 handles all of them:
 
 | Tool | Purpose |
 |---|---|
-| **Node.js** | Required for Claude Code (npm install) and mermaid-cli |
-| **Python 3** | Used by setup scripts for JSON/YAML processing and plugin permissions sync |
-| **Google Cloud SDK (`gcloud`)** | Google OAuth and API access — `brew install --cask google-cloud-sdk` |
+| **Node.js** | Required for Claude Code and mermaid-cli |
+| **Go** | Builds the vibe Go CLI |
+| **Python 3** | JSON/YAML processing and plugin sync |
+| **Google Cloud SDK** | Google OAuth and API access |
+| **jq, yq, ripgrep, gh** | Dev tooling used by skills and agents |
 
 ### Optional accounts (prompted during setup)
 
 | Account | What it enables |
 |---|---|
-| **Google account** (free) | Gmail, Docs, Sheets, Slides, Calendar, Forms, Tasks APIs |
-| **GitHub account** | GitHub MCP integration — repo management, PRs, issues |
-| **Databricks workspace** | Databricks CLI, AI Dev Kit, query/deploy tools (prompted — skipped if not needed) |
+| **Google account** (free) | Gmail, Docs, Sheets, Slides, Calendar, Forms, Tasks |
+| **GitHub account** | Repo management, PRs, issues via MCP |
+| **Databricks workspace** | CLI, AI Dev Kit, query/deploy tools (skipped if not needed) |
 | **JIRA instance** | Ticket search, creation, and management |
-| **Slack workspace** | Slack MCP integration (optional in Step 7) |
-
-### Verify prerequisites
-
-```bash
-# Check that Homebrew is installed
-brew --version
-
-# Check git
-git --version
-
-# (Optional) Check Python 3
-python3 --version
-```
-
-If Homebrew is not installed, run:
-```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
+| **Slack workspace** | Slack MCP integration |
 
 ## After Setup
 
