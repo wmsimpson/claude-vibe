@@ -118,6 +118,20 @@ else
   ERRORS=$((ERRORS + 1))
 fi
 
+# ── Check: Python 3 (required for installer state management) ───────────────
+if command -v python3 &>/dev/null; then
+  ok "Python 3 $(python3 --version 2>&1 | awk '{print $2}')"
+else
+  warn "Python 3 not found — installing..."
+  if command -v brew &>/dev/null; then
+    brew install python3 &>/dev/null && ok "Python 3 installed" || { fail "Failed to install Python 3"; ERRORS=$((ERRORS + 1)); }
+  else
+    fail "Python 3 not found and Homebrew not available"
+    echo "  Install with: brew install python3"
+    ERRORS=$((ERRORS + 1))
+  fi
+fi
+
 # ── Info: Platform ──────────────────────────────────────────────────────────
 if [[ "$PLATFORM" == "macos" ]]; then
   ARCH="$(uname -m)"
