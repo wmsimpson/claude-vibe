@@ -14,6 +14,7 @@ step_install_plugins() {
     "workflows"
     "vibe-setup"
     "specialized-agents"
+    "community-skills"
     "macos-scheduler"
     "lean-sigma-tools"
     "jira-tools"
@@ -26,6 +27,7 @@ step_install_plugins() {
     "Workflows (Architecture diagrams, RCA, POC docs, Security questionnaires)"
     "Setup & Diagnostics (Validate, usage stats, integrations)"
     "Diagram Agents (Lucid Chart, Graphviz)"
+    "Community Skills (Humanizer, PPTX, Find Skills, Web Design, Spark Data Source)"
     "macOS Scheduler (launchd background tasks)"
     "Lean Six Sigma (FMEA, SIPOC, Process Maps)"
     "JIRA (Search, create, update tickets)"
@@ -76,6 +78,15 @@ step_install_plugins() {
 
   print_blank
   print_success "$installed/${#selected_plugins[@]} plugins installed"
+
+  # Install superpowers (external plugin — development workflow skills)
+  print_blank
+  print_step "Installing superpowers (brainstorming, TDD, code review, planning)..."
+  if claude plugin install superpowers@claude-plugins-official &>/dev/null; then
+    print_success "superpowers"
+  else
+    print_warn "superpowers install failed — install manually: claude plugin install superpowers@claude-plugins-official"
+  fi
 
   # Sync permissions
   print_blank

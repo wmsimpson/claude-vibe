@@ -19,6 +19,7 @@ claude-vibe/
 │   ├── lean-sigma-tools/         Lean Six Sigma process tools
 │   ├── macos-scheduler/          macOS launchd task scheduler
 │   ├── specialized-agents/       Mermaid diagrams, web dev testing
+│   ├── community-skills/        Humanizer, PPTX, find-skills, web design, Spark
 │   ├── vibe-setup/               Environment setup and validation
 │   └── workflows/                Workflow automation
 ├── scripts/                      Linting and utility scripts

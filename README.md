@@ -111,12 +111,15 @@ All plugins ship with this repo — no external repos or git clones required.
 | `workflows` | Architecture diagrams, RCA, POC docs, security questionnaires, sizing |
 | `vibe-setup` | Environment setup, validation, usage stats, integrations |
 | `specialized-agents` | Lucid Chart diagrams, Graphviz, web dev testing |
+| `community-skills` | Humanizer, PPTX creator/editor, find-skills, web design guidelines, Spark data sources |
 | `databricks-tools` | Databricks queries, deployments, workspace management, demos |
 | `jira-tools` | Search, create, view, comment on JIRA tickets |
 | `macos-scheduler` | Schedule recurring launchd tasks on macOS |
 | `lean-sigma-tools` | FMEA risk tables, SIPOC diagrams, swimlane process maps |
 | `mcp-servers` | MCP server framework (future-ready) |
 | `shared-resources` | Shared Python utilities and configs across plugins |
+
+Additionally, the **superpowers** plugin (from `claude-plugins-official`) is installed automatically. It provides brainstorming, writing-plans, test-driven-development, systematic-debugging, code review, and other development workflow skills.
 
 During setup, you can install all plugins or select specific ones interactively.
 
@@ -217,10 +220,11 @@ claude-vibe/
     workflows/         Workflow automation skills + agents
     vibe-setup/        Setup and diagnostics skills + agents
     specialized-agents/  Diagram and testing agents
+    community-skills/  Humanizer, PPTX, find-skills, web design, Spark data sources
     databricks-tools/  Databricks integration skills + agents
     jira-tools/        JIRA skills + agents
     macos-scheduler/   macOS scheduler skills
-    lean-sigma-tools/     Lean Six Sigma skills
+    lean-sigma-tools/  Lean Six Sigma skills
     mcp-servers/       MCP server framework
     shared-resources/  Shared utilities
   .claude-plugin/         Plugin manifests (plugin.json, marketplace.json)
