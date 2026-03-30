@@ -96,7 +96,7 @@ vibe profile delete work      # Delete a profile
 | 3 | Enable Google APIs and set quota project | 1 min |
 | 4 | Install dev tools (go, jq, yq, rg, node, gh, mmdc, graphviz, gcloud) | 2 min |
 | 5 | Install Databricks AI Dev Kit *(optional — skipped if Databricks not enabled)* | 3 min |
-| 6 | Install Claude Code plugins from bundled collection | 1 min |
+| 6 | Install plugins, superpowers, external skills, and claude-mem | 2 min |
 | 7 | Configure MCP integrations (GitHub, Chrome DevTools, optional others) | 2 min |
 | 8 | Run full validation suite | 30 sec |
 
@@ -119,7 +119,16 @@ All plugins ship with this repo — no external repos or git clones required.
 | `mcp-servers` | MCP server framework (future-ready) |
 | `shared-resources` | Shared Python utilities and configs across plugins |
 
-Additionally, the **superpowers** plugin (from `claude-plugins-official`) is installed automatically. It provides brainstorming, writing-plans, test-driven-development, systematic-debugging, code review, and other development workflow skills.
+### External Plugins & Skills (auto-installed in Step 6)
+
+| Plugin/Skill | Source | What it provides |
+|-------------|--------|-----------------|
+| **superpowers** | `claude-plugins-official` | Brainstorming, writing-plans, TDD, systematic-debugging, code review, subagent-driven development |
+| **claude-mem** | `thedotmack/claude-mem` | Persistent session memory with compression and vector search (requires manual `/plugin install claude-mem` after setup) |
+| **legal-document-analyzer** | `qodex-ai/ai-agent-skills` | Analyze legal documents |
+| **contract-review** | `guia-matthieu/clawfu-skills` | Review contracts for risks and issues |
+| **contract-and-proposal-writer** | `borghei/claude-skills` | Draft contracts and proposals |
+| **legal-cog** | `aaaaqwq/claude-code-skills` | Legal reasoning and analysis |
 
 During setup, you can install all plugins or select specific ones interactively.
 

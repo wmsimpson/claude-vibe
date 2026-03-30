@@ -79,13 +79,49 @@ step_install_plugins() {
   print_blank
   print_success "$installed/${#selected_plugins[@]} plugins installed"
 
-  # Install superpowers (external plugin — development workflow skills)
+  # ── External plugins ──────────────────────────────────────────────────
   print_blank
-  print_step "Installing superpowers (brainstorming, TDD, code review, planning)..."
+  print_step "Installing external plugins..."
+
+  # Superpowers — development workflow (brainstorming, TDD, code review, planning)
   if claude plugin install superpowers@claude-plugins-official &>/dev/null; then
-    print_success "superpowers"
+    print_success "superpowers (brainstorming, TDD, code review, planning)"
   else
     print_warn "superpowers install failed — install manually: claude plugin install superpowers@claude-plugins-official"
+  fi
+
+  # claude-mem — persistent memory compression (auto-captures sessions, vector search)
+  print_step "Installing claude-mem (persistent session memory)..."
+  print_info "claude-mem requires interactive install. After setup completes, run:"
+  echo ""
+  echo -e "    ${CYAN}claude${NC}  then type  ${CYAN}/plugin install claude-mem${NC}"
+  echo ""
+
+  # ── External skills (via skills CLI) ─────────────────────────────────
+  print_blank
+  print_step "Installing external skills..."
+
+  if command -v npx &>/dev/null; then
+    local skills_installed=0
+
+    # Legal skills
+    for skill in \
+      "qodex-ai/ai-agent-skills@legal-document-analyzer" \
+      "guia-matthieu/clawfu-skills@contract-review" \
+      "borghei/claude-skills@contract-and-proposal-writer" \
+      "aaaaqwq/claude-code-skills@legal-cog"; do
+      local skill_name="${skill##*@}"
+      if npx skills add "$skill" -g -y &>/dev/null; then
+        print_success "$skill_name"
+        skills_installed=$((skills_installed + 1))
+      else
+        print_warn "$skill_name — install failed (may be private repo)"
+      fi
+    done
+
+    print_success "$skills_installed external skills installed"
+  else
+    print_warn "npx not found — skipping external skills. Install Node.js and re-run this step."
   fi
 
   # Sync permissions
